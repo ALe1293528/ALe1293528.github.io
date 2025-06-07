@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "SQL预编译——预编译真的能完美防御SQL注入吗"
-date:   2025-4-20
+date:   2025-6-7
 tags: [网络安全]
 comments: true
 author: ALe

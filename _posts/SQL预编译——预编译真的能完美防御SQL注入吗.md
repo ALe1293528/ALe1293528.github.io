@@ -1,3 +1,11 @@
+---
+layout: post
+title: "SQL预编译——预编译真的能完美防御SQL注入吗"
+date:   2025-4-20
+tags: [网络安全]
+comments: true
+author: ALe
+---
 ## <font style="color:rgba(0, 0, 0, 0.85);">SQL注入原理</font>
 <font style="color:rgb(51, 51, 51);">sql注入是指攻击者拼接恶意SQL语句到接受外部参数的动态SQL查询中，程序本身  
 </font><font style="color:rgb(51, 51, 51);">未对插入的SQL语句进行过滤，导致SQL语句直接被服务端执行。  

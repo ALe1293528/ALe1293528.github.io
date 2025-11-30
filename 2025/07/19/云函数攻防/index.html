@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>云函数攻防 | ALe's Blog</title><meta name="author" content="ALe"><meta name="copyright" content="ALe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在学习云函数之前，我们要先了解一下Serverless Serverless概述简单来说，Serverless就是无需管理服务器的架构模式，我们只需要写业务代码，云平台会自动处理部署、弹性扩容、资源调度、运维运作等一切幕后工作 在狭义上来讲Serverless可以分成以下两个方面 123456789┌─────────────────────────────────────────────────">
+<meta property="og:type" content="article">
+<meta property="og:title" content="云函数攻防">
+<meta property="og:url" content="https://ale1293528.github.io/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/index.html">
+<meta property="og:site_name" content="ALe&#39;s Blog">
+<meta property="og:description" content="在学习云函数之前，我们要先了解一下Serverless Serverless概述简单来说，Serverless就是无需管理服务器的架构模式，我们只需要写业务代码，云平台会自动处理部署、弹性扩容、资源调度、运维运作等一切幕后工作 在狭义上来讲Serverless可以分成以下两个方面 123456789┌─────────────────────────────────────────────────">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ale1293528.github.io/img/mygo6.jpg">
+<meta property="article:published_time" content="2025-07-19T14:32:53.000Z">
+<meta property="article:modified_time" content="2025-07-19T16:47:13.942Z">
+<meta property="article:author" content="ALe">
+<meta property="article:tag" content="云安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ale1293528.github.io/img/mygo6.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "云函数攻防",
+  "url": "https://ale1293528.github.io/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/",
+  "image": "https://ale1293528.github.io/img/mygo6.jpg",
+  "datePublished": "2025-07-19T14:32:53.000Z",
+  "dateModified": "2025-07-19T16:47:13.942Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALe",
+      "url": "https://ale1293528.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ale1293528.github.io/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '云函数攻防',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/mygo6.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALe's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">云函数攻防</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">云函数攻防</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-07-19T14:32:53.000Z" title="Created 2025-07-19 22:32:53">2025-07-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-07-19T16:47:13.942Z" title="Updated 2025-07-20 00:47:13">2025-07-20</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>在学习云函数之前，我们要先了解一下Serverless</p>
+<h2 id="Serverless概述"><a href="#Serverless概述" class="headerlink" title="Serverless概述"></a>Serverless概述</h2><p>简单来说，Serverless就是无需管理服务器的架构模式，我们只需要写业务代码，云平台会自动处理部署、弹性扩容、资源调度、运维运作等一切幕后工作</p>
+<p>在狭义上来讲Serverless可以分成以下两个方面</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">┌───────────────────────────────────────────────────────────┐</span><br><span class="line">│                        Serverless                         │</span><br><span class="line">└────────────┬────────────────────────────────┬─────────────┘</span><br><span class="line">             │                                │</span><br><span class="line"> ┌───────────▼────────────┐      ┌────────────▼───────────┐</span><br><span class="line"> │  FaaS：函数即服务       │      │  BaaS：后端即服务       │</span><br><span class="line"> │  Function as a Service │      │  Backend as a Service  │</span><br><span class="line"> └────────────────────────┘      └────────────────────────┘</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>无服务器（Serverless）不是表示没有服务器，而是表示当使用Serverless时，我们无需关心底层的资源，也无需登录服务器和优化服务器，只需关注最核心的代码片段，即可跳过复杂的、繁琐的基本工作。</p>
+<p>本文主要研究的是函数即服务，也就是云函数</p>
+<h2 id="什么是云函数"><a href="#什么是云函数" class="headerlink" title="什么是云函数"></a>什么是云函数</h2><p>首先，函数我们都了解，是程序中的一段可以被重复调用、具有特定功能的代码结构</p>
+<p><strong>云函数</strong>就是一种运行在云端的函数，属于 Serverless 架构的核心组件。你只需编写函数代码，云平台自动完成运行环境、部署、调度和扩容。 真正实现了只写业务逻辑，其他全部自动化  </p>
+<p>函数即服务提供的是一种直接在云上运行无状态的、短暂的、由事件触发的代码的能力。</p>
+<p>函数即服务和传统应用架构不同，函数即服务提供的是事件触发式的运行方式，云函数不是始终运行的状态，而是在事件发生时由事件触发运行，并且在一次运行的过程中处理这一次事件。因此在云函数的代码中，仅需考虑针对一个事件的处理流程，而针对大量事件的高并发处理，由平台实现云函数的多实例并发来支持。</p>
+<p>云函数无法长驻，调用的时候创建，执行完之后立即就销毁，所以无法直接保存状态。</p>
+<p>偷一张图片来，便于理解</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2025/png/51527989/1750888471829-f7e627aa-2c1b-44d8-a513-b022594a8857.png"></p>
+<p>当服务没有被请求时，云计算上并没有这个函数的实例。一旦请求发出，调度平台将以毫秒级的服务实例化一个服务并完成响应。请求处理完成后，调度服务又将自动收回这个实例。云函数的使用成本只要是由调用次数、资源使用量和外网出流量等统计出来，而如果在业务低谷期，访问量少的时候，运维的成本是很小的。对于创业公司来讲，可以省去大部分初期运维的费用，可见价值还是很大的</p>
+<h3 id="执行方法"><a href="#执行方法" class="headerlink" title="执行方法"></a>执行方法</h3><p>对应项目的main函数是程序执行的起点</p>
+<p>在调用云函数时，首先会寻找执行方法作为入口，执行用户的代码，用户需以文件名.执行方法名的形式进行设置</p>
+<p>例如用户设置的执行方法为 index.handler，则 SCF 平台会首先寻找代码程序包中的 index 文件，并找到该文件中的 handler 方法开始执行。</p>
+<h3 id="函数入参"><a href="#函数入参" class="headerlink" title="函数入参"></a>函数入参</h3><p>函数入参，是指函数在被触发调用时所传递给函数的内容。通常情况下，函数入参包括 <strong>event</strong> 和 <strong>context</strong> 两部分，但根据开发语言和环境的不同，入参个数可能有所不同</p>
+<h4 id="event"><a href="#event" class="headerlink" title="event"></a>event</h4><p>event 参数类型为 dict，event 中包含了触发函数执行的基本信息，可以是平台定义的格式，也可以自定义格式。函数被触发开始执行后，可以在代码内部对 event 进行处理</p>
+<p>有两种方法可以触发云函数SCF执行：</p>
+<ul>
+<li>通过调用云API触发函数执行</li>
+<li>通过绑定触发器触发函数执行</li>
+</ul>
+<h4 id="context"><a href="#context" class="headerlink" title="context"></a>context</h4><p>context 为 SCF 平台提供的入参，将 context 入参传递给执行方法，代码可通过解析 context 入参对象，获取到运行环境及当前请求的相关信息</p>
+<p>具体可以看腾讯云的官方手册，这里不再赘述</p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/document/product/583/9210">云函数 基本概念_腾讯云</a></p>
+<h3 id="函数返回"><a href="#函数返回" class="headerlink" title="函数返回"></a>函数返回</h3><p>SCF 平台会获取到云函数执行完成后的返回值，并根据下表中不同的触发方式进行处理。</p>
+<table>
+<thead>
+<tr>
+<th>触发方式</th>
+<th>处理方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>同步触发</td>
+<td>通过 API 网关、云 API 同步 invoke 触发函数的方式为同步触发。<br/>使用同步方式触发的函数在执行期间，SCF 平台不会返回触发结果。<br/>在函数执行完成后，SCF 平台会将函数返回值封装为 JSON 格式并返回给调用方。</td>
+</tr>
+<tr>
+<td>异步触发</td>
+<td>使用异步方式触发的云函数，SCF 平台接收触发事件后，会返回触发请求 ID 。<br/>在函数执行完成后，函数的返回值会封装为 JSON 格式并存储在日志中。<br/>用户可在函数执行完成后，通过返回的请求 ID 查询日志获取该异步触发函数的返回值。</td>
+</tr>
+</tbody></table>
+<p>当函数中的代码返回具体值时，通常返回特定的数据结构。例如 ：</p>
+<table>
+<thead>
+<tr>
+<th>运行环境</th>
+<th>返回数据结构类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python</td>
+<td>简单数据结构或 dict 数据结构</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>JSON Object</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>Array 结构</td>
+</tr>
+<tr>
+<td>GO</td>
+<td>简单的数据结构或带有 JSON 描述的 struct</td>
+</tr>
+</tbody></table>
+<p>为保证针对各开发语言和环境的统一性，函数返回会使用 <strong>JSON 数据格式统一封装</strong>。SCF 平台在获取到例如以上运行环境函数的返回值后，将会对返回的数据结构进行 JSON 化，并返回 JSON 内容到调用方。</p>
+<h3 id="触发器和触发源"><a href="#触发器和触发源" class="headerlink" title="触发器和触发源"></a>触发器和触发源</h3><ul>
+<li>任何可以产生事件，触发云函数执行的均可以被称为触发器或触发源。触发器在本身产生事件后，通过将事件传递给云函数来触发函数运行。</li>
+<li>触发器在触发函数时，可以根据自身特点，使用同步或异步方式触发函数。同步方式触发函数时，触发器将等待函数执行完成并获取到函数执行结果；异步方式触发函数时，触发器将仅触发函数而忽略函数执行结果。</li>
+<li>腾讯云云函数在和腾讯云的某些产品或服务对接时，也有自身实现的一些特殊方式，例如推（PUSH）模式和拉（PULL）模式。<ul>
+<li>推模式：触发器主动将事件推送至云函数平台并触发函数运行。</li>
+<li>拉模式：云函数平台通过拉取模块，从触发器中拉取到事件并触发云函数运行。</li>
+</ul>
+</li>
+</ul>
+<p>攻防方面，我们也可以通过云函数实现一系列操作，例如各种扫描器，还有一些其他的，基本上就是基于python的，可以去看python黑帽子这本书，附上我创业未半中道崩殂的知识库链接<a target="_blank" rel="noopener" href="https://www.yuque.com/u49948530/us3qv7">https://www.yuque.com/u49948530/us3qv7</a></p>
+<p>至于实操的话，鼠鼠手里没有米，没钱买云服务，下次一定</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io">ALe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/">https://ale1293528.github.io/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BA%91%E5%AE%89%E5%85%A8/">云安全</a></div><div class="post-share"><div class="social-share" data-image="/img/mygo6.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/07/20/%E6%97%A5%E8%AE%B0/" title="日记"><img class="cover" src="/img/anon2.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">日记</div></div><div class="info-2"><div class="info-item-1">之前发在CSDN了，但是感觉这种东西发在CSDN太尴尬了，还是删了发在我自己的blog里吧 最近鼠鼠也是来到上海打拼（实习）了，那么秉持着来都来了的原则，鼠鼠也是去bw逛了逛，虽说没票只能在外场看看😭。可惜几乎没有多少我非常喜欢的ip，不由感慨现在的二次元圈已经变样了。 虽说我知道内场有邦邦的展台，但是令人感慨的是居然没有多少邦邦的cos，但是偶遇了一位cos猫猫的老师整整三次，外场一次地铁站一次地铁上一次，可惜出于我的社恐还是没有敢上去集邮😭社恐的毛病到底什么时候能改口牙。 最近看了不少圈内师傅的blog，但是比起技术博客，我发现我还是更爱看大佬们分享日常，也是不由得心生写个日常的想法，但是回头一看，全是流水账，典型的工科思维（bushi 为什么要写博客呢，一开始是看了我们学校特别强的一个师傅toka✌🏻的博客。那时我还很年轻，里面的内容都看不懂，但是却让我心生和toka✌🏻一样写博客的想法。开始学网安后，尤其是今年不断深入，又看了不少师傅的博客，正如上文所说，最爱看的还是师傅们的日常的分享，也是不得不感慨师傅们除了技术牛，文笔也是一流，不是我这种只会流水账的小垃圾能比...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/08/05/%E4%BA%91%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%90%86%E7%BB%95%E8%BF%87ip%E5%B0%81%E9%94%81/" title="云函数实现代理绕过ip封锁"><img class="cover" src="/img/mygo1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-05</div><div class="info-item-2">云函数实现代理绕过ip封锁</div></div><div class="info-2"><div class="info-item-1">云函数可以用来搭建一个轻量代理池或 IP 中转机制，原理上跟传统代理池类似，虽然匿名性不如高匿商业代理，但在做扫描器等任务时依然方便实用，前提是控制好访问频率和风险 配置函数代码123456789101112131415161718192021222324252627282930313233343536373839404142# -*- coding: utf8 -*-import jsonimport picklefrom base64 import b64decode, b64encodeimport requestsSCF_TOKEN = &quot;TOKEN&quot; #需要自定义随机值，用于鉴权def authorization():    return &#123;        &quot;isBase64Encoded&quot;: False,        &quot;statusCode&quot;: 401,        &quot;headers&quot;: &#123;&#125;,        &quot;body&quot;: &quot...</div></div></div></a><a class="pagination-related" href="/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/" title="云函数隐藏C2"><img class="cover" src="/img/anon1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-29</div><div class="info-item-2">云函数隐藏C2</div></div><div class="info-2"><div class="info-item-1">核心思想核心思想其实很简单，就是用第三方提供的服务接收 C2 客户端的流量，转发给 C2 服务端，避免直接暴露服务端，也可以用加白的域名混淆视听避免蓝队人员发现攻击和反连行为 12345   运行木马                                           收到上线包┌─────▼─────┐             ┌─────▼─────┐           ┌──────▼───────┐│  受害主机  │--发送上线包-&gt;│ 国内某公有 |---上线包-&gt;│ Cobalt Strike││           │&lt;-执行命令----│ 函数转发   │&lt;-执行命令-│    服务器     |└───────────┘             └───────────┘           └──────────────┘  第三方服务最好具备以下特点：  国内外访问速度都很快 国外厂商 价格便宜（有钱可以忽略） 主动提供免费加速域名（同上）  云函数配置首先进入腾讯云创建一个自定义函数，运行环境选 python，将...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ALe</div><div class="author-info-description">从渗透测试到网安烧烤的一生</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ALe1293528"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">恐惧扼住咽喉，如枷锁禁锢我的双臂 我向沉默发问，沉默却愈发震耳欲聋</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Serverless%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">Serverless概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%91%E5%87%BD%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text">什么是云函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E6%96%B9%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">执行方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%82"><span class="toc-number">2.2.</span> <span class="toc-text">函数入参</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#event"><span class="toc-number">2.2.1.</span> <span class="toc-text">event</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#context"><span class="toc-number">2.2.2.</span> <span class="toc-text">context</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E"><span class="toc-number">2.3.</span> <span class="toc-text">函数返回</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91%E5%99%A8%E5%92%8C%E8%A7%A6%E5%8F%91%E6%BA%90"><span class="toc-number">2.4.</span> <span class="toc-text">触发器和触发源</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"><img src="/img/mygo6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"/></a><div class="content"><a class="title" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行">文件解压之过（Zip Slip）漏洞导致 Python 代码执行</a><time datetime="2025-11-30T03:58:13.000Z" title="Created 2025-11-30 11:58:13">2025-11-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img src="/img/mygo7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BehinderV4魔改"/></a><div class="content"><a class="title" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改">BehinderV4魔改</a><time datetime="2025-10-30T12:38:13.000Z" title="Created 2025-10-30 20:38:13">2025-10-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程"><img src="/img/mygo1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Python多线程"/></a><div class="content"><a class="title" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程">Python多线程</a><time datetime="2025-10-26T13:23:24.000Z" title="Created 2025-10-26 21:23:24">2025-10-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础"><img src="/img/mygo2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Docker基础"/></a><div class="content"><a class="title" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础">Docker基础</a><time datetime="2025-10-17T08:01:55.000Z" title="Created 2025-10-17 16:01:55">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp"><img src="/img/anon3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2025年江苏省第七届大学生网络安全知识技能大赛-wp"/></a><div class="content"><a class="title" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp">2025年江苏省第七届大学生网络安全知识技能大赛-wp</a><time datetime="2025-09-22T10:38:33.000Z" title="Created 2025-09-22 18:38:33">2025-09-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By ALe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

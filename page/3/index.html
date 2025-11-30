@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>ALe's Blog</title><meta name="author" content="ALe"><meta name="copyright" content="ALe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
+<meta property="og:title" content="ALe&#39;s Blog">
+<meta property="og:url" content="https://ale1293528.github.io/page/3/index.html">
+<meta property="og:site_name" content="ALe&#39;s Blog">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ale1293528.github.io/img/anon1.png">
+<meta property="article:author" content="ALe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ale1293528.github.io/img/anon1.png"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ale1293528.github.io/page/3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ALe\'s Blog',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'home'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header" style="background-image: url(/img/anon.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALe's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="site-info"><h1 id="site-title">ALe's Blog</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts nc" id="recent-posts"><div class="recent-post-items"><div class="recent-post-item"><div class="post_cover left"><a href="/2025/07/21/python%E5%86%85%E5%AD%98%E9%A9%AC/" title="python 内存马"><img class="post-bg" src="/img/mygo3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="python 内存马"></a></div><div class="recent-post-info"><a class="article-title" href="/2025/07/21/python%E5%86%85%E5%AD%98%E9%A9%AC/" title="python 内存马">python 内存马</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2025-07-21T14:43:33.000Z" title="Created 2025-07-21 22:43:33">2025-07-21</time></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a></span></div><div class="content">之前一直想学内存马，但是碍于对 java 的了解近乎为0，对jndi的了解也是只停留在会背面经的层面，所以一直没有去学，直到后来翻一些文章发现 python 也可以利用 SSTI 进行内存马注入，于是迅速开整 Flask常见的 Python Web 框架如 Django 和 Flask 都有可能存在 SSTI（Server-Side Template Injection，服务端模板注入）漏洞 在 Flask 中，使用 render_template_string() 渲染模板时，若将用户输入直接传入而未做过滤处理，就可能导致 SSTI 漏洞。攻击者可通过该漏洞注入恶意模板代码，从而实现 代码执行，甚至进一步植入 内存马 内存马注入原理（Flask 路由机制）Flask 常规注册路由的方式是通过装饰器 @app.route()，但底层实际是调用了： 1self.add_url_rule(rule, endpoint=None, view_func=None)  各参数说明如下：  rule：URL 路径（必须以 / 开头），与 @app.route() 中的路径一致 endpoin...</div></div></div><div class="recent-post-item"><div class="post_cover right"><a href="/2025/07/21/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-Bluecms/" title="代码审计-Bluecms"><img class="post-bg" src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="代码审计-Bluecms"></a></div><div class="recent-post-info"><a class="article-title" href="/2025/07/21/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-Bluecms/" title="代码审计-Bluecms">代码审计-Bluecms</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2025-07-21T02:21:23.000Z" title="Created 2025-07-21 10:21:23">2025-07-21</time></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a></span></div><div class="content">著名开源 cms，也是有很多漏洞，正好拿来先练个手  用 phpstudy 先随便搭一个出来 先简单过一下目录结构 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748bluecms/├── admin/                     # 后台管理系统│   ├── config.inc.php         # 后台配置文件│   ├── index.php              # 后台登录入口│   ├── main.php               # 后台主界面│   ├── ...                    # 各种管理模块文件│├── api/                     	 # api接口│   ├── index.htm              # 防止目录浏览│   └── uc.php                 # 用户中心接口文件│├── data/                   ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/2025/07/20/%E6%97%A5%E8%AE%B0/" title="日记"><img class="post-bg" src="/img/anon2.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="日记"></a></div><div class="recent-post-info"><a class="article-title" href="/2025/07/20/%E6%97%A5%E8%AE%B0/" title="日记">日记</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2025-07-19T16:45:14.000Z" title="Created 2025-07-20 00:45:14">2025-07-20</time></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E9%9A%8F%E7%AC%94/">随笔</a></span></div><div class="content">之前发在CSDN了，但是感觉这种东西发在CSDN太尴尬了，还是删了发在我自己的blog里吧 最近鼠鼠也是来到上海打拼（实习）了，那么秉持着来都来了的原则，鼠鼠也是去bw逛了逛，虽说没票只能在外场看看😭。可惜几乎没有多少我非常喜欢的ip，不由感慨现在的二次元圈已经变样了。 虽说我知道内场有邦邦的展台，但是令人感慨的是居然没有多少邦邦的cos，但是偶遇了一位cos猫猫的老师整整三次，外场一次地铁站一次地铁上一次，可惜出于我的社恐还是没有敢上去集邮😭社恐的毛病到底什么时候能改口牙。 最近看了不少圈内师傅的blog，但是比起技术博客，我发现我还是更爱看大佬们分享日常，也是不由得心生写个日常的想法，但是回头一看，全是流水账，典型的工科思维（bushi 为什么要写博客呢，一开始是看了我们学校特别强的一个师傅toka✌🏻的博客。那时我还很年轻，里面的内容都看不懂，但是却让我心生和toka✌🏻一样写博客的想法。开始学网安后，尤其是今年不断深入，又看了不少师傅的博客，正如上文所说，最爱看的还是师傅们的日常的分享，也是不得不感慨师傅们除了技术牛，文笔也是一流，不是我这种只会流水账的小垃圾能比...</div></div></div><div class="recent-post-item"><div class="post_cover right"><a href="/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/" title="云函数攻防"><img class="post-bg" src="/img/mygo6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="云函数攻防"></a></div><div class="recent-post-info"><a class="article-title" href="/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/" title="云函数攻防">云函数攻防</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2025-07-19T14:32:53.000Z" title="Created 2025-07-19 22:32:53">2025-07-19</time></span><span class="article-meta tags"><span class="article-meta-separator">|</span><i class="fas fa-tag"></i><a class="article-meta__tags" href="/tags/%E4%BA%91%E5%AE%89%E5%85%A8/">云安全</a></span></div><div class="content">在学习云函数之前，我们要先了解一下Serverless Serverless概述简单来说，Serverless就是无需管理服务器的架构模式，我们只需要写业务代码，云平台会自动处理部署、弹性扩容、资源调度、运维运作等一切幕后工作 在狭义上来讲Serverless可以分成以下两个方面 123456789┌───────────────────────────────────────────────────────────┐│                        Serverless                         │└────────────┬────────────────────────────────┬─────────────┘             │                                │ ┌───────────▼────────────┐      ┌────────────▼───────────┐ │  FaaS：函数即服务       │      │  BaaS：后端即服务       │ │  Funct...</div></div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/2/#content-inner"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#content-inner">2</a><span class="page-number current">3</span></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ALe</div><div class="author-info-description">从渗透测试到网安烧烤的一生</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ALe1293528"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">恐惧扼住咽喉，如枷锁禁锢我的双臂 我向沉默发问，沉默却愈发震耳欲聋</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"><img src="/img/mygo6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"/></a><div class="content"><a class="title" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行">文件解压之过（Zip Slip）漏洞导致 Python 代码执行</a><time datetime="2025-11-30T03:58:13.000Z" title="Created 2025-11-30 11:58:13">2025-11-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img src="/img/mygo7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BehinderV4魔改"/></a><div class="content"><a class="title" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改">BehinderV4魔改</a><time datetime="2025-10-30T12:38:13.000Z" title="Created 2025-10-30 20:38:13">2025-10-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程"><img src="/img/mygo1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Python多线程"/></a><div class="content"><a class="title" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程">Python多线程</a><time datetime="2025-10-26T13:23:24.000Z" title="Created 2025-10-26 21:23:24">2025-10-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础"><img src="/img/mygo2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Docker基础"/></a><div class="content"><a class="title" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础">Docker基础</a><time datetime="2025-10-17T08:01:55.000Z" title="Created 2025-10-17 16:01:55">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp"><img src="/img/anon3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2025年江苏省第七届大学生网络安全知识技能大赛-wp"/></a><div class="content"><a class="title" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp">2025年江苏省第七届大学生网络安全知识技能大赛-wp</a><time datetime="2025-09-22T10:38:33.000Z" title="Created 2025-09-22 18:38:33">2025-09-22</time></div></div></div></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%BA%91%E5%AE%89%E5%85%A8/" style="font-size: 1.3em; color: #99a1ac">云安全</a> <a href="/tags/web%E5%AE%89%E5%85%A8/" style="font-size: 1.5em; color: #99a9bf">web安全</a> <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" style="font-size: 1.1em; color: #999">代码审计</a> <a href="/tags/CTF/" style="font-size: 1.4em; color: #99a5b6">CTF</a> <a href="/tags/%E9%9A%8F%E7%AC%94/" style="font-size: 1.3em; color: #99a1ac">随笔</a> <a href="/tags/%E5%85%8D%E6%9D%80/" style="font-size: 1.1em; color: #999">免杀</a> <a href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" style="font-size: 1.2em; color: #999da3">内网渗透</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2025/11/">
+            <span class="card-archive-list-date">
+              November 2025
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2025/10/">
+            <span class="card-archive-list-date">
+              October 2025
+            </span>
+            <span class="card-archive-list-count">3</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2025/09/">
+            <span class="card-archive-list-date">
+              September 2025
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2025/08/">
+            <span class="card-archive-list-date">
+              August 2025
+            </span>
+            <span class="card-archive-list-count">10</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2025/07/">
+            <span class="card-archive-list-date">
+              July 2025
+            </span>
+            <span class="card-archive-list-count">8</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">24</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-11-30T04:30:07.202Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By ALe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>window.typedJSFn = {
+  init: str => {
+    window.typed = new Typed('#subtitle', Object.assign({
+      strings: str,
+      startDelay: 300,
+      typeSpeed: 150,
+      loop: true,
+      backSpeed: 50,
+    }, null))
+  },
+  run: subtitleType => {
+    if (true) {
+      if (typeof Typed === 'function') {
+        subtitleType()
+      } else {
+        btf.getScript('https://cdn.jsdelivr.net/npm/typed.js/dist/typed.umd.min.js').then(subtitleType)
+      }
+    } else {
+      subtitleType()
+    }
+  },
+  processSubtitle: (content, extraContents = []) => {
+    if (true) {
+      const sub = ["「坏心思的神明，给我带来了禮物」"].slice()
+
+      if (extraContents.length > 0) {
+        sub.unshift(...extraContents)
+      }
+
+      if (typeof content === 'string') {
+        sub.unshift(content)
+      } else if (Array.isArray(content)) {
+        sub.unshift(...content)
+      }
+
+      sub.length > 0 && typedJSFn.init(sub)
+    } else {
+      document.getElementById('subtitle').textContent = typeof content === 'string' ? content :
+        (Array.isArray(content) && content.length > 0 ? content[0] : '')
+    }
+  }
+}
+btf.addGlobalFn('pjaxSendOnce', () => { typed.destroy() }, 'typedDestroy')
+</script><script>function subtitleType () {
+  typedJSFn.processSubtitle(["「坏心思的神明，给我带来了禮物」"])
+}
+typedJSFn.run(subtitleType)</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

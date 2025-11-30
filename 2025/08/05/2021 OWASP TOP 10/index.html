@@ -1,0 +1,511 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2021 OWASP TOP 10 | ALe's Blog</title><meta name="author" content="ALe"><meta name="copyright" content="ALe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="近些年漏洞的威胁分类也发生了很大变化，王道SQL注入也慢慢淡出历史的舞台，最新OWASP Top Ten | OWASP Foundation版，分类和排名都变化了很多  [TOP1]失效的访问控制访问控制失效指的是：系统没有正确限制用户访问资源或功能，导致用户可以访问本不该访问的内容或操作 具体的例子：用户越权访问 用户 A 修改自己的资料：  1POST &#x2F;api&#x2F;user&#x2F;update?id">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2021 OWASP TOP 10">
+<meta property="og:url" content="https://ale1293528.github.io/2025/08/05/2021%20OWASP%20TOP%2010/index.html">
+<meta property="og:site_name" content="ALe&#39;s Blog">
+<meta property="og:description" content="近些年漏洞的威胁分类也发生了很大变化，王道SQL注入也慢慢淡出历史的舞台，最新OWASP Top Ten | OWASP Foundation版，分类和排名都变化了很多  [TOP1]失效的访问控制访问控制失效指的是：系统没有正确限制用户访问资源或功能，导致用户可以访问本不该访问的内容或操作 具体的例子：用户越权访问 用户 A 修改自己的资料：  1POST &#x2F;api&#x2F;user&#x2F;update?id">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ale1293528.github.io/img/anon3.jpg">
+<meta property="article:published_time" content="2025-08-05T11:02:52.000Z">
+<meta property="article:modified_time" content="2025-08-05T11:04:51.818Z">
+<meta property="article:author" content="ALe">
+<meta property="article:tag" content="web安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ale1293528.github.io/img/anon3.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "2021 OWASP TOP 10",
+  "url": "https://ale1293528.github.io/2025/08/05/2021%20OWASP%20TOP%2010/",
+  "image": "https://ale1293528.github.io/img/anon3.jpg",
+  "datePublished": "2025-08-05T11:02:52.000Z",
+  "dateModified": "2025-08-05T11:04:51.818Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALe",
+      "url": "https://ale1293528.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ale1293528.github.io/2025/08/05/2021%20OWASP%20TOP%2010/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2021 OWASP TOP 10',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/anon3.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALe's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">2021 OWASP TOP 10</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">2021 OWASP TOP 10</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-08-05T11:02:52.000Z" title="Created 2025-08-05 19:02:52">2025-08-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-08-05T11:04:51.818Z" title="Updated 2025-08-05 19:04:51">2025-08-05</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>近些年漏洞的威胁分类也发生了很大变化，王道SQL注入也慢慢淡出历史的舞台，最新<a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-ten/">OWASP Top Ten | OWASP Foundation</a>版，分类和排名都变化了很多</p>
+<p><img src="/img/owasptop10.png"></p>
+<h1 id="TOP1-失效的访问控制"><a href="#TOP1-失效的访问控制" class="headerlink" title="[TOP1]失效的访问控制"></a>[TOP1]失效的访问控制</h1><p><strong>访问控制失效</strong>指的是：系统<strong>没有正确限制用户访问资源或功能</strong>，导致用户可以访问<strong>本不该访问的内容或操作</strong></p>
+<h2 id="具体的例子："><a href="#具体的例子：" class="headerlink" title="具体的例子："></a>具体的例子：</h2><h3 id="用户越权访问"><a href="#用户越权访问" class="headerlink" title="用户越权访问"></a>用户越权访问</h3><ul>
+<li>用户 A 修改自己的资料：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /api/user/update?id=1001</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>他把 ID 改成了管理员的 ID：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /api/user/update?id=1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>没有权限校验？那就直接修改管理员信息成功了</li>
+</ul>
+<h3 id="水平越权"><a href="#水平越权" class="headerlink" title="水平越权"></a>水平越权</h3><p>普通用户访问了其他用户的数据，比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET /api/orders/123456</span><br></pre></td></tr></table></figure>
+
+<p>→ 返回了别人的订单信息（严重泄露）</p>
+<h3 id="垂直越权"><a href="#垂直越权" class="headerlink" title="垂直越权"></a>垂直越权</h3><p>普通用户调用了管理员接口：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /api/admin/delete_user?id=2</span><br></pre></td></tr></table></figure>
+
+<p>如果没检查角色权限，就能直接删号</p>
+<h3 id="前端控制误信"><a href="#前端控制误信" class="headerlink" title="前端控制误信"></a>前端控制误信</h3><p>前端隐藏了按钮，认为“用户就点不到”：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 管理员按钮 --&gt;</span><br><span class="line">&lt;button style=&quot;display: none&quot;&gt;删除用户&lt;/button&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然而攻击者直接 F12 改代码，照样能点</p>
+<h1 id="TOP2-加密机制失效"><a href="#TOP2-加密机制失效" class="headerlink" title="[TOP2]加密机制失效"></a>[TOP2]加密机制失效</h1><p>它其实是以前叫做“敏感数据暴露（Sensitive Data Exposure）”的进化版，专门指：加密没做好 or 该加密却没加密，导致敏感信息暴露</p>
+<h2 id="什么叫“加密机制失效”？"><a href="#什么叫“加密机制失效”？" class="headerlink" title="什么叫“加密机制失效”？"></a>什么叫“加密机制失效”？</h2><p>就是本来你用了加密，结果：</p>
+<ul>
+<li>用错算法了</li>
+<li>密钥管理乱套了</li>
+<li>加密流程瞎写</li>
+<li>本该加密的地方压根没加密</li>
+</ul>
+<p>结果攻击者轻轻松松就拿到敏感数据：密码、银行卡、身份信息、Token、session、甚至数据库内容……</p>
+<h2 id="常见的失效方式："><a href="#常见的失效方式：" class="headerlink" title="常见的失效方式："></a>常见的失效方式：</h2><table>
+<thead>
+<tr>
+<th>错误类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用弱加密算法</td>
+<td>使用 MD5&#x2F;SHA1 加密密码</td>
+</tr>
+<tr>
+<td>明文传输敏感信息</td>
+<td>登录时通过 HTTP 提交用户名密码</td>
+</tr>
+<tr>
+<td>明文存储敏感数据</td>
+<td>数据库里直接存储身份证、手机号等</td>
+</tr>
+<tr>
+<td>加密后泄露密钥</td>
+<td>把密钥写在代码里、GitHub里</td>
+</tr>
+<tr>
+<td>没有加密</td>
+<td>比如 Cookie 没有设置 <code>Secure + HttpOnly</code></td>
+</tr>
+<tr>
+<td>错误的加密流程</td>
+<td>密文没有加随机盐、IV 被复用等</td>
+</tr>
+</tbody></table>
+<h2 id="攻击者怎么利用"><a href="#攻击者怎么利用" class="headerlink" title="攻击者怎么利用"></a>攻击者怎么利用</h2><ul>
+<li>截获未加密的 HTTP 请求，拿到账号密码。</li>
+<li>拿到数据库后用字典暴力破解 MD5 加密的密码。</li>
+<li>从前端源码或 Git 泄漏中拿到 AES 密钥解密所有数据。</li>
+<li>复用泄漏的 JWT Token 冒充他人身份</li>
+</ul>
+<h1 id="TOP3-注入"><a href="#TOP3-注入" class="headerlink" title="[TOP3]注入"></a>[TOP3]注入</h1><p>最经典的一集</p>
+<h2 id="什么是注入漏洞（Injection）？"><a href="#什么是注入漏洞（Injection）？" class="headerlink" title="什么是注入漏洞（Injection）？"></a>什么是注入漏洞（Injection）？</h2><p>就是应用程序<strong>把用户输入当成代码或命令执行了</strong>，攻击者通过构造恶意输入，控制程序行为，从而实现：</p>
+<ul>
+<li>执行任意命令</li>
+<li>查询&#x2F;篡改&#x2F;删除数据库</li>
+<li>提权、越权</li>
+<li>甚至远程控制服务器</li>
+</ul>
+<h2 id="常见的注入类型"><a href="#常见的注入类型" class="headerlink" title="常见的注入类型"></a>常见的注入类型</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>简介</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SQL 注入</strong></td>
+<td>向数据库查询语句中注入恶意 SQL 代码</td>
+</tr>
+<tr>
+<td><strong>命令注入</strong></td>
+<td>向系统命令中注入恶意命令</td>
+</tr>
+<tr>
+<td><strong>LDAP 注入</strong></td>
+<td>向 LDAP 查询语句中注入内容</td>
+</tr>
+<tr>
+<td><strong>XPATH 注入</strong></td>
+<td>攻击 XML 查询逻辑</td>
+</tr>
+<tr>
+<td><strong>NoSQL 注入</strong></td>
+<td>攻击 MongoDB、Redis 等非关系型数据库</td>
+</tr>
+<tr>
+<td><strong>表达式注入</strong></td>
+<td>如 SpEL、OGNL 等框架表达式被执行</td>
+</tr>
+<tr>
+<td><strong>ORM 注入</strong></td>
+<td>即使用了 ORM 框架，但拼接查询也能被注入</td>
+</tr>
+</tbody></table>
+<h1 id="TOP4-不安全的设计"><a href="#TOP4-不安全的设计" class="headerlink" title="[TOP4]不安全的设计"></a>[TOP4]不安全的设计</h1><p><strong>不安全的设计</strong>指的是：在系统架构、业务流程、功能逻辑上，<strong>一开始就没有考虑安全</strong>，导致再怎么加补丁也“补不住”。  </p>
+<p> 它和“实现缺陷”不同，强调的是<strong>设计阶段</strong>的安全问题，而不是代码实现时的小失误</p>
+<h2 id="举个栗子："><a href="#举个栗子：" class="headerlink" title="举个栗子："></a>举个栗子：</h2><h3 id="例1：没有验证码"><a href="#例1：没有验证码" class="headerlink" title="例1：没有验证码"></a>例1：没有验证码</h3><ul>
+<li>登录接口无限试错 → 被爆破了</li>
+<li>注册接口被批量打脚本 → 被刷号了</li>
+</ul>
+<h3 id="例2：密码重置只用邮箱地址就能触发"><a href="#例2：密码重置只用邮箱地址就能触发" class="headerlink" title="例2：密码重置只用邮箱地址就能触发"></a>例2：密码重置只用邮箱地址就能触发</h3><ul>
+<li>没有身份验证 → 轻松盗号</li>
+</ul>
+<h3 id="例3：未做权限分离的业务逻辑"><a href="#例3：未做权限分离的业务逻辑" class="headerlink" title="例3：未做权限分离的业务逻辑"></a>例3：未做权限分离的业务逻辑</h3><ul>
+<li>所有人都能访问 <code>/admin/delete_user?id=1</code></li>
+</ul>
+<h3 id="例4：可预测的文件上传路径"><a href="#例4：可预测的文件上传路径" class="headerlink" title="例4：可预测的文件上传路径"></a>例4：可预测的文件上传路径</h3><ul>
+<li>上传文件保存为 <code>/upload/&#123;用户名&#125;.jpg</code></li>
+<li>恶意访问 <code>/upload/admin.jpg</code> 直接泄露敏感资源</li>
+</ul>
+<h1 id="TOP5-安全配置错误"><a href="#TOP5-安全配置错误" class="headerlink" title="[TOP5]安全配置错误"></a>[TOP5]安全配置错误</h1><h2 id="什么是“安全配置错误”？"><a href="#什么是“安全配置错误”？" class="headerlink" title="什么是“安全配置错误”？"></a>什么是“安全配置错误”？</h2><p>安全配置错误是指：<strong>系统、框架、服务器、数据库等组件的默认配置太危险</strong>，或者运维部署过程中配置疏忽、遗漏，导致被攻击者利用的情况。</p>
+<p>一不小心就把“后门”留给了黑客</p>
+<h2 id="常见的配置错误示例："><a href="#常见的配置错误示例：" class="headerlink" title="常见的配置错误示例："></a>常见的配置错误示例：</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>默认密码未修改</td>
+<td>admin&#x2F;admin、root&#x2F;root、123456</td>
+</tr>
+<tr>
+<td>目录&#x2F;文件暴露</td>
+<td><code>.git/</code>、<code>/backup.zip</code>、<code>/WEB-INF/</code>可访问</td>
+</tr>
+<tr>
+<td>错误信息泄露</td>
+<td>报错页面暴露堆栈、路径、数据库结构等</td>
+</tr>
+<tr>
+<td>开启调试模式</td>
+<td>Flask 的 <code>debug=True</code>，Spring Boot 的 actuator</td>
+</tr>
+<tr>
+<td>开放未使用端口</td>
+<td>Redis、Elasticsearch、MongoDB 未授权访问</td>
+</tr>
+<tr>
+<td>跨域配置不当</td>
+<td>CORS 允许任意来源：<code>Access-Control-Allow-Origin: *</code></td>
+</tr>
+<tr>
+<td>缺少 HTTP 安全头</td>
+<td>没设置 <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code> 等</td>
+</tr>
+<tr>
+<td>TLS 配置弱</td>
+<td>使用 SSL3.0、弱密码套件、没有证书校验</td>
+</tr>
+<tr>
+<td>容器或云服务配置问题</td>
+<td>Docker 映射敏感目录、云 bucket 设置成公开可读写</td>
+</tr>
+</tbody></table>
+<h1 id="TOP6-自带缺陷和过时的组件"><a href="#TOP6-自带缺陷和过时的组件" class="headerlink" title="[TOP6]自带缺陷和过时的组件"></a>[TOP6]自带缺陷和过时的组件</h1><h2 id="什么是“自带缺陷和过时的组件”？"><a href="#什么是“自带缺陷和过时的组件”？" class="headerlink" title="什么是“自带缺陷和过时的组件”？"></a>什么是“自带缺陷和过时的组件”？</h2><p>指的是：你的项目中依赖了<strong>有已知漏洞</strong>的软件组件、库、框架、服务，但你却<strong>没有及时更新、替换或做防护</strong>，攻击者一看版本就知道怎么打。</p>
+<p>也叫：</p>
+<ul>
+<li>第三方组件漏洞</li>
+<li>供应链安全问题的一种</li>
+</ul>
+<h2 id="常见的“有毒”组件例子："><a href="#常见的“有毒”组件例子：" class="headerlink" title="常见的“有毒”组件例子："></a>常见的“有毒”组件例子：</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>漏洞例子</th>
+<th>危害</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Web框架</strong></td>
+<td>Struts2（S2-045）</td>
+<td>远程命令执行</td>
+</tr>
+<tr>
+<td><strong>JS库</strong></td>
+<td>jQuery &lt;1.9</td>
+<td>XSS 漏洞</td>
+</tr>
+<tr>
+<td><strong>Java依赖</strong></td>
+<td>log4j（Log4Shell）</td>
+<td>任意代码执行</td>
+</tr>
+<tr>
+<td><strong>Python包</strong></td>
+<td>requests 老版本</td>
+<td>SSL验证绕过</td>
+</tr>
+<tr>
+<td><strong>Node库</strong></td>
+<td>lodash、express 老版本</td>
+<td>多种原型链污染</td>
+</tr>
+<tr>
+<td><strong>CMS系统</strong></td>
+<td>WordPress 插件漏洞</td>
+<td>任意文件上传、SQL注入</td>
+</tr>
+</tbody></table>
+<p>只要我们获得了某个组件的版本，就可以用<a target="_blank" rel="noopener" href="https://www.exploit-db.com/">https://www.exploit-db.com/</a>去查找对应的 exp</p>
+<p>当然有时 exp 会不奏效，我们可以根据实际情况对 exp 进行修改</p>
+<h1 id="TOP7-身份识别和身份验证错误"><a href="#TOP7-身份识别和身份验证错误" class="headerlink" title="[TOP7]身份识别和身份验证错误"></a>[TOP7]身份识别和身份验证错误</h1><h2 id="什么是“身份识别与身份验证错误”？"><a href="#什么是“身份识别与身份验证错误”？" class="headerlink" title="什么是“身份识别与身份验证错误”？"></a>什么是“身份识别与身份验证错误”？</h2><p>指的是系统在<strong>识别用户身份</strong>或<strong>验证用户合法性</strong>的机制上设计不当、实现出错，导致攻击者可以伪装他人、绕过登录、劫持账号、撞库成功等</p>
+<h2 id="具体表现有哪些？"><a href="#具体表现有哪些？" class="headerlink" title="具体表现有哪些？"></a>具体表现有哪些？</h2><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>示例</th>
+<th>危害</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>弱密码策略</td>
+<td>可以设置 <code>123456</code> 或 <code>admin</code></td>
+<td>被撞库&#x2F;穷举轻松成功</td>
+</tr>
+<tr>
+<td>无登录限制</td>
+<td>登录接口无限尝试密码</td>
+<td>爆破成功，账户被盗</td>
+</tr>
+<tr>
+<td>验证码缺失&#x2F;可绕过</td>
+<td>验证码固定、简单或能跳过</td>
+<td>自动化暴力攻击</td>
+</tr>
+<tr>
+<td>Session管理不当</td>
+<td>Token 泄露、过期机制缺失</td>
+<td>会话固定、劫持</td>
+</tr>
+<tr>
+<td>身份验证信息明文传输</td>
+<td>HTTP 明文传用户名&#x2F;密码</td>
+<td>被中间人攻击窃取</td>
+</tr>
+<tr>
+<td>多因子认证缺失</td>
+<td>仅靠密码验证</td>
+<td>易被撞库或钓鱼攻击</td>
+</tr>
+<tr>
+<td>身份切换不安全</td>
+<td>登录后修改参数切换为他人身份</td>
+<td>水平越权或账号接管</td>
+</tr>
+</tbody></table>
+<h1 id="TOP8-软件和数据完整性故障"><a href="#TOP8-软件和数据完整性故障" class="headerlink" title="[TOP8]软件和数据完整性故障"></a>[TOP8]软件和数据完整性故障</h1><h2 id="什么是“软件和数据完整性故障”？"><a href="#什么是“软件和数据完整性故障”？" class="headerlink" title="什么是“软件和数据完整性故障”？"></a>什么是“软件和数据完整性故障”？</h2><p>指的是：<strong>系统在运行过程中依赖的软件、配置、代码或数据</strong>，<strong>没有进行完整性校验</strong>或校验机制被绕过，攻击者就可以篡改这些内容，进而控制系统。</p>
+<p>简而言之：<br><strong>你信任的东西被“偷偷动手脚”了，但你没检查</strong></p>
+<h2 id="常见攻击场景"><a href="#常见攻击场景" class="headerlink" title="常见攻击场景"></a><strong>常见攻击场景</strong></h2><table>
+<thead>
+<tr>
+<th><strong>类型</strong></th>
+<th><strong>示例</strong></th>
+<th><strong>后果</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>供应链投毒</strong></td>
+<td>**开发依赖了被挂马的 NPM 包（如 **<code>**event-stream**</code><strong>）</strong></td>
+<td><strong>项目编译就中毒，攻击者远控系统</strong></td>
+</tr>
+<tr>
+<td><strong>自动更新缺乏签名验证</strong></td>
+<td><strong>软件启动时更新 <strong><code>**.exe**</code></strong> 没做签名校验</strong></td>
+<td><strong>MITM 劫持替换为木马</strong></td>
+</tr>
+<tr>
+<td><strong>CI&#x2F;CD 脚本可被注入</strong></td>
+<td><strong>发布脚本中引用外部 Bash&#x2F;Python 脚本</strong></td>
+<td><strong>远程代码执行、上传后门</strong></td>
+</tr>
+<tr>
+<td><strong>缺少完整性校验</strong></td>
+<td><strong>静态文件未设置 Hash，容易被篡改</strong></td>
+<td><strong>攻击者插入恶意 JS&#x2F;XSS</strong></td>
+</tr>
+<tr>
+<td><strong>Docker 镜像来源不明</strong></td>
+<td><strong>使用了不可信的第三方镜像</strong></td>
+<td><strong>镜像自带恶意服务或后门账号</strong></td>
+</tr>
+</tbody></table>
+<h1 id="TOP9-安全日志和监控故障"><a href="#TOP9-安全日志和监控故障" class="headerlink" title="[TOP9]安全日志和监控故障"></a>[TOP9]安全日志和监控故障</h1><h2 id="什么是“安全日志和监控故障-”？"><a href="#什么是“安全日志和监控故障-”？" class="headerlink" title="什么是“安全日志和监控故障 ”？"></a>什么是“安全日志和监控故障 ”？</h2><p><strong>安全日志和监控故障</strong>是指系统未能妥善记录安全相关事件，或者在发生攻击或异常时未能及时检测与响应，导致攻击行为未被发现或延迟应对，从而扩大损害范围。</p>
+<h3 id="常见表现"><a href="#常见表现" class="headerlink" title="常见表现"></a>常见表现</h3><ul>
+<li>系统关键操作没有记录日志，如登录、权限变更、敏感数据访问。</li>
+<li>日志记录过于简单或不一致，缺乏时间戳、用户标识、IP 信息等。</li>
+<li>日志没有集中存储或无法追踪。</li>
+<li>未部署 SIEM（安全信息与事件管理）系统或告警规则缺失。</li>
+<li>日志被攻击者删除或篡改后无恢复机制。</li>
+<li>发生攻击时无自动响应机制（如封锁 IP、断开连接等）。</li>
+</ul>
+<h3 id="实际危害"><a href="#实际危害" class="headerlink" title="实际危害"></a>实际危害</h3><ul>
+<li><strong>攻击滞后发现</strong>：例如 Webshell 被植入服务器几个月都未被察觉。</li>
+<li><strong>取证困难</strong>：无法还原攻击路径，影响溯源与司法调查。</li>
+<li><strong>监管不合规</strong>：如金融、医疗等行业必须满足日志留存合规要求。</li>
+<li><strong>扩大损害</strong>：攻击者反复尝试暴力破解或横向移动而不被发现。</li>
+</ul>
+<h1 id="TOP10-服务器端请求伪造-SSRF"><a href="#TOP10-服务器端请求伪造-SSRF" class="headerlink" title="[TOP10]服务器端请求伪造(SSRF)"></a>[TOP10]服务器端请求伪造(SSRF)</h1><h2 id="什么是“服务器端请求伪造-SSRF-”？"><a href="#什么是“服务器端请求伪造-SSRF-”？" class="headerlink" title="什么是“服务器端请求伪造(SSRF) ”？"></a>什么是“服务器端请求伪造(SSRF) ”？</h2><p>SSRF 是指攻击者诱使 <strong>服务器端发起请求</strong>，目标通常是：</p>
+<ul>
+<li>内网服务（如 <code>http://127.0.0.1:2375</code>）</li>
+<li>云服务元数据接口（如 AWS 的 <code>http://169.254.169.254/latest/meta-data/</code>）</li>
+<li>其他本不应被访问的地址</li>
+</ul>
+<h3 id="攻击原理："><a href="#攻击原理：" class="headerlink" title="攻击原理："></a>攻击原理：</h3><p>攻击者控制请求地址，让服务器代为访问：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /fetch?url=http://169.254.169.254/latest/meta-data/iam/</span><br></pre></td></tr></table></figure>
+
+<p>服务端拿这个 URL 去请求，就泄露了内部数据。</p>
+<h3 id="检测方法（实战技巧）："><a href="#检测方法（实战技巧）：" class="headerlink" title="检测方法（实战技巧）："></a>检测方法（实战技巧）：</h3><ul>
+<li>使用 burp 修改参数试探内网 IP，如：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">url=http://127.0.0.1:80/</span><br><span class="line">url=http://localhost:2375/</span><br><span class="line">url=http://169.254.169.254/</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>利用 DNSlog 验证是否存在请求发出</li>
+<li>用 Gopher 协议构造 Redis 注入等高级 SSRF</li>
+</ul>
+<h3 id="延伸场景（云原生）："><a href="#延伸场景（云原生）：" class="headerlink" title="延伸场景（云原生）："></a>延伸场景（云原生）：</h3><ul>
+<li>SSRF 是打穿云平台、K8S 集群、获取云凭证的第一步</li>
+<li>可与 <strong>RCE、反序列化、身份提升</strong>等漏洞组合使用，形成 <strong>链式攻击</strong></li>
+</ul>
+<p>**— **</p>
+<p>OWASP Top 10 总结了当今最常见且最严重的 Web 安全风险，涵盖了访问控制失效、加密机制薄弱、注入攻击、设计缺陷、配置错误、使用过时组件、身份验证问题、完整性缺失、日志监控不足以及服务器端请求伪造等各个层面。<br>了解这些风险的原理、成因和防护方式，有助于开发者、运维人员与安全工程师在系统设计与实现过程中构建更加健壮、可信赖的应用程序。<br>安全不是一次性的操作，而是一个持续演进的过程。只有将安全理念融入整个软件生命周期，才能真正有效降低攻击面，提升整体防护水平。  </p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io">ALe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io/2025/08/05/2021%20OWASP%20TOP%2010/">https://ale1293528.github.io/2025/08/05/2021%20OWASP%20TOP%2010/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/web%E5%AE%89%E5%85%A8/">web安全</a></div><div class="post-share"><div class="social-share" data-image="/img/anon3.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/08/07/SQL%E9%A2%84%E7%BC%96%E8%AF%91%E2%80%94%E2%80%94%E9%A2%84%E7%BC%96%E8%AF%91%E7%9C%9F%E7%9A%84%E8%83%BD%E5%AE%8C%E7%BE%8E%E9%98%B2%E5%BE%A1SQL%E6%B3%A8%E5%85%A5%E5%90%97/" title="SQL预编译——预编译真的能完美防御SQL注入吗"><img class="cover" src="/img/mygo4.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">SQL预编译——预编译真的能完美防御SQL注入吗</div></div><div class="info-2"><div class="info-item-1">SQL注入原理sql注入是指攻击者拼接恶意SQL语句到接受外部参数的动态SQL查询中，程序本身未对插入的SQL语句进行过滤，导致SQL语句直接被服务端执行。拼接的SQL查询例如，通过在id变量后插入or 1&#x3D;1这样的条件，来绕过身份验证，获得未授权数据的访问权。 1SELECT * FROM user WHERE id = -1 or 1=1  由于or 1&#x3D;1 满足永真结果，sql语句会执行输出user中的全部内容。 那么这么危险的漏洞，有没有办法进行阻止呢 有的兄弟，有的 预编译就能解决大部分的SQL注入问题 什么是预编译（Prepared Statement）？预编译就是在执行 SQL 前，把 SQL 语句先告诉数据库服务器，编译好结构，然后再单独传参数进去执行！ 它的全名叫： Prepared Statement（预处理语句 &#x2F; 预编译语句） 正常写 SQL 是怎样的？我们先看看普通的拼接 SQL 是怎样的： 123username = input(&quot;请输入用户名：&quot;)sql = &quot;SELECT * FROM u...</div></div></div></a><a class="pagination-related" href="/2025/08/05/Wie%20wird%20man%20seinen%20Schatten%20los%EF%BC%9F/" title="Wie wird man seinen Schatten los？"><img class="cover" src="/img/mygo2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Wie wird man seinen Schatten los？</div></div><div class="info-2"><div class="info-item-1">Wen soll man fragen , wenn man sich selber nicht versteht ? 若你不曾了解自己，又该向谁究问何事？  Wie kann man frei sein , wenn man seinem eigenen Scatten nie entgeht ? 若你不曾逃离傍身之影，又该从何得到自由解脱？  Was soll mir die Unsterblichkeit ? Vor dem Sterben will ich leben 不朽于我毫无价值，所求无非向死而生  Der Grabgeruch der Lorbeergruft , betäubt mich nieht mehr 陵墓的腐蠹之气，将不再诱我沉迷  Angst , die mir den Atem raubt , blei auf meinen Schultern 恐惧扼住咽喉，如枷锁禁锢我的双臂 Schweign , das mir Fragen stellt,und keine Antwort gibt auf mein Warum 我向沉默发问，沉默却愈发震耳欲...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/07/24/ADS%E6%95%B0%E6%8D%AE%E6%B5%81%E5%AE%9E%E7%8E%B0%E9%9A%90%E8%97%8F%E6%96%87%E4%BB%B6/" title="ADS数据流实现隐藏文件"><img class="cover" src="/img/mygo5.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-24</div><div class="info-item-2">ADS数据流实现隐藏文件</div></div><div class="info-2"><div class="info-item-1">ADS：Alternate DataStreams，全称 NTFS 交换数据流，是 NTFS 磁盘格式的一个特性，在 NTFS 文件系统下，每个文件都可以存在多个数据流。简单来说，就是其他文件可以寄宿在某个文件身上。利用 ADS 数据流可以做很多有趣的事情 在NTFS分区创建ADS数据流文件有两种形式：  一是指定宿主文件； 二是创建单独的ADS文件。  创建的指令有两个：echo 和 type  echo 用于常规字符 type 用于将文件附加到某个文件  使用方法1. 使用宿主文件1echo test &gt; 1.txt:flag.txt 正常用 dir 是无法查看到的，可以使用 dir &#x2F;r 123456789101112131415161718192021222324C:\test&gt;dir 驱动器 C 中的卷没有标签。 卷的序列号是 46BD-3363 C:\test 的目录2025/07/22  03:53    &lt;DIR&gt;          .2025/07/22  03:53    &lt;DIR&gt;          ..2025...</div></div></div></a><a class="pagination-related" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img class="cover" src="/img/mygo7.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-30</div><div class="info-item-2">BehinderV4魔改</div></div><div class="info-2"><div class="info-item-1">“冰蝎”(Behinder)是一个动态二进制加密网站管理客户端，相比较于传统的老牌工具“菜刀”而言，对webshell的流量进行了相应的加密。”冰蝎”客户端基于JAVA，所以可以跨平台使用，随着版本的升级，兼容性也随之提升。主要功能为：基本信息、命令执行、虚拟终端、文件管理、Socks代理、反弹shell、数据库管理、自定义代码等，功能非常强大，是现如今必不可少的渗透测试工具之一 如今借助大模型，ai 对流量中木马特征的监测已经越来越准确，可冰蝎早已不再更新，木马上传上去之间就落地成盒，所以我们要对冰蝎马在原本的基础上进行改造 冰蝎特征冰蝎有两个强特征，分别是  和数据包一大堆加密 如果这个数据包可以用冰蝎的传输协议解密，那就实锤为冰蝎马 除此之外还有数个弱特征例如 connection：keep-alive ，固定的 ua 头等 所以我们的魔改需要解决两个问题：  绕过识别（魔改打乱指纹信息） 绕过查杀（新增加密算法）  JAP 反编译打包构建https://www.decompiler.com/ 在这个网站在线反编译，然后下载下来（也可以用 jd-gui 工具反编译） 在 i...</div></div></div></a><a class="pagination-related" href="/2025/08/23/SQL%20to%20RCE/" title="SQL to RCE"><img class="cover" src="/img/anon1.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-23</div><div class="info-item-2">SQL to RCE</div></div><div class="info-2"><div class="info-item-1"> 有一些陈旧、庞大的系统中，因为一些复杂的原因，往往仍在使用 sa 账户登入 SQL Server，而在有如此高权限的资料库账户权限下，我们可以轻易利用 xp_cmdshell 来执行系统指令，但是这是几乎不可能的，我们取得的数据库账户必然是低权限，但因为发现的 SQL 注入是堆叠注入，我们仍然可以对表进行 CRUD，运气好可以控制一些网站设定变数的话，甚至可以直接 RCE  就比如我们可以发现某些特殊的数据库： 123456Database: ASPState[2 tables]+---------------------------------------+| dbo.ASPStateTempApplications          || dbo.ASPStateTempSessions              |+---------------------------------------+  这个数据库的存在用途是用来保存 ASP.NET 网站应用程式的 session。  在 ASP.NET 网站应用程式里，Session（会话数据，比如用户登录状态、购物车资料）...</div></div></div></a><a class="pagination-related" href="/2025/08/21/Python-Bottle-SSTI/" title="Python Bottle SSTI"><img class="cover" src="/img/mygo2.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-21</div><div class="info-item-2">Python Bottle SSTI</div></div><div class="info-2"><div class="info-item-1">XYCTF 中碰到的 Bottle 框架，当时做题根本没想到通过审计框架代码找漏洞点，也是学到新东西了  Bottle 简介Bottle 是一个 Python 的轻量级 Web 框架，完全依赖标准库（除了 wsgi 的部分），体积非常小（一个 .py 文件就能运行），适合写小型 Web 应用、API 或原型系统。它的设计理念是 “单文件、零依赖”，所以部署非常方便。 主要特点   特点 说明    单文件 框架代码就是一个 bottle.py 文件，方便直接打包或拷贝   零依赖 除了 Python 标准库外不需要额外安装其它库   内置开发服务器 用 run() 就能启动 HTTP 服务   支持多模板引擎 默认内置 SimpleTemplate，也支持 Jinja2、Mako 等   路由简洁 使用装饰器 @route() 定义 URL 对应的处理函数   WSGI兼容 可以在任何 WSGI 服务器（如 gunicorn、uWSGI）上部署   内置常用工具 请求&#x2F;响应处理、静态文件服务、Cookie、表单解析等   基本结构示例1234567from bottle...</div></div></div></a><a class="pagination-related" href="/2025/08/07/SQL%E9%A2%84%E7%BC%96%E8%AF%91%E2%80%94%E2%80%94%E9%A2%84%E7%BC%96%E8%AF%91%E7%9C%9F%E7%9A%84%E8%83%BD%E5%AE%8C%E7%BE%8E%E9%98%B2%E5%BE%A1SQL%E6%B3%A8%E5%85%A5%E5%90%97/" title="SQL预编译——预编译真的能完美防御SQL注入吗"><img class="cover" src="/img/mygo4.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-07</div><div class="info-item-2">SQL预编译——预编译真的能完美防御SQL注入吗</div></div><div class="info-2"><div class="info-item-1">SQL注入原理sql注入是指攻击者拼接恶意SQL语句到接受外部参数的动态SQL查询中，程序本身未对插入的SQL语句进行过滤，导致SQL语句直接被服务端执行。拼接的SQL查询例如，通过在id变量后插入or 1&#x3D;1这样的条件，来绕过身份验证，获得未授权数据的访问权。 1SELECT * FROM user WHERE id = -1 or 1=1  由于or 1&#x3D;1 满足永真结果，sql语句会执行输出user中的全部内容。 那么这么危险的漏洞，有没有办法进行阻止呢 有的兄弟，有的 预编译就能解决大部分的SQL注入问题 什么是预编译（Prepared Statement）？预编译就是在执行 SQL 前，把 SQL 语句先告诉数据库服务器，编译好结构，然后再单独传参数进去执行！ 它的全名叫： Prepared Statement（预处理语句 &#x2F; 预编译语句） 正常写 SQL 是怎样的？我们先看看普通的拼接 SQL 是怎样的： 123username = input(&quot;请输入用户名：&quot;)sql = &quot;SELECT * FROM u...</div></div></div></a><a class="pagination-related" href="/2025/09/15/base64%E8%A7%A3%E7%A0%81%E5%B0%8Ftrick/" title="base64解码小trick"><img class="cover" src="/img/mygo5.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-15</div><div class="info-item-2">base64解码小trick</div></div><div class="info-2"><div class="info-item-1">N1CTF Junior 2025 2&#x2F;2 中的，也是不出意料没做出来 python 的 base64 解码逻辑和命令行的 base64 命令是不一致的 Python 的base64.b64decode(..., validate=True)在遇到 padding（=）后还有额外的 base64 字符，会报错，而用默认解码base64.b64decode(...)时，只会解出等号前的那一部分 但是命令行中会将两段都成功解出并拼接 这是因为 Base64 的编码本质上是一系列 4 字符为一组的字符块，最后一组可能用 = 填充以满足块对齐，根据解析器类型的不同，解析方法也会有区别  **严格解析器（Python 的 ****validate=True**）：一旦遇到合法的填充字符 =，就认为这是该 base64 段的结束；如果填充后仍有数据，会报错为“padding 之后有额外数据” 宽松&#x2F;流式解析器（GNU **base64 -d** 等）：通常会把整个输入当作可能包含多个 base64 段（或忽略某些格式约束），会尽量解出每一段能解的部分，因此出现“先解出第一...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ALe</div><div class="author-info-description">从渗透测试到网安烧烤的一生</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ALe1293528"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">恐惧扼住咽喉，如枷锁禁锢我的双臂 我向沉默发问，沉默却愈发震耳欲聋</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP1-%E5%A4%B1%E6%95%88%E7%9A%84%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6"><span class="toc-number">1.</span> <span class="toc-text">[TOP1]失效的访问控制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%9A%84%E4%BE%8B%E5%AD%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">具体的例子：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E8%B6%8A%E6%9D%83%E8%AE%BF%E9%97%AE"><span class="toc-number">1.1.1.</span> <span class="toc-text">用户越权访问</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B0%B4%E5%B9%B3%E8%B6%8A%E6%9D%83"><span class="toc-number">1.1.2.</span> <span class="toc-text">水平越权</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9E%82%E7%9B%B4%E8%B6%8A%E6%9D%83"><span class="toc-number">1.1.3.</span> <span class="toc-text">垂直越权</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E6%8E%A7%E5%88%B6%E8%AF%AF%E4%BF%A1"><span class="toc-number">1.1.4.</span> <span class="toc-text">前端控制误信</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP2-%E5%8A%A0%E5%AF%86%E6%9C%BA%E5%88%B6%E5%A4%B1%E6%95%88"><span class="toc-number">2.</span> <span class="toc-text">[TOP2]加密机制失效</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E5%8F%AB%E2%80%9C%E5%8A%A0%E5%AF%86%E6%9C%BA%E5%88%B6%E5%A4%B1%E6%95%88%E2%80%9D%EF%BC%9F"><span class="toc-number">2.1.</span> <span class="toc-text">什么叫“加密机制失效”？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%A4%B1%E6%95%88%E6%96%B9%E5%BC%8F%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">常见的失效方式：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E8%80%85%E6%80%8E%E4%B9%88%E5%88%A9%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">攻击者怎么利用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP3-%E6%B3%A8%E5%85%A5"><span class="toc-number">3.</span> <span class="toc-text">[TOP3]注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%EF%BC%88Injection%EF%BC%89%EF%BC%9F"><span class="toc-number">3.1.</span> <span class="toc-text">什么是注入漏洞（Injection）？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.2.</span> <span class="toc-text">常见的注入类型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP4-%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">4.</span> <span class="toc-text">[TOP4]不安全的设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BE%E4%B8%AA%E6%A0%97%E5%AD%90%EF%BC%9A"><span class="toc-number">4.1.</span> <span class="toc-text">举个栗子：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B1%EF%BC%9A%E6%B2%A1%E6%9C%89%E9%AA%8C%E8%AF%81%E7%A0%81"><span class="toc-number">4.1.1.</span> <span class="toc-text">例1：没有验证码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B2%EF%BC%9A%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE%E5%8F%AA%E7%94%A8%E9%82%AE%E7%AE%B1%E5%9C%B0%E5%9D%80%E5%B0%B1%E8%83%BD%E8%A7%A6%E5%8F%91"><span class="toc-number">4.1.2.</span> <span class="toc-text">例2：密码重置只用邮箱地址就能触发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B3%EF%BC%9A%E6%9C%AA%E5%81%9A%E6%9D%83%E9%99%90%E5%88%86%E7%A6%BB%E7%9A%84%E4%B8%9A%E5%8A%A1%E9%80%BB%E8%BE%91"><span class="toc-number">4.1.3.</span> <span class="toc-text">例3：未做权限分离的业务逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B4%EF%BC%9A%E5%8F%AF%E9%A2%84%E6%B5%8B%E7%9A%84%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E8%B7%AF%E5%BE%84"><span class="toc-number">4.1.4.</span> <span class="toc-text">例4：可预测的文件上传路径</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP5-%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF"><span class="toc-number">5.</span> <span class="toc-text">[TOP5]安全配置错误</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF%E2%80%9D%EF%BC%9F"><span class="toc-number">5.1.</span> <span class="toc-text">什么是“安全配置错误”？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">5.2.</span> <span class="toc-text">常见的配置错误示例：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP6-%E8%87%AA%E5%B8%A6%E7%BC%BA%E9%99%B7%E5%92%8C%E8%BF%87%E6%97%B6%E7%9A%84%E7%BB%84%E4%BB%B6"><span class="toc-number">6.</span> <span class="toc-text">[TOP6]自带缺陷和过时的组件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E8%87%AA%E5%B8%A6%E7%BC%BA%E9%99%B7%E5%92%8C%E8%BF%87%E6%97%B6%E7%9A%84%E7%BB%84%E4%BB%B6%E2%80%9D%EF%BC%9F"><span class="toc-number">6.1.</span> <span class="toc-text">什么是“自带缺陷和过时的组件”？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E2%80%9C%E6%9C%89%E6%AF%92%E2%80%9D%E7%BB%84%E4%BB%B6%E4%BE%8B%E5%AD%90%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">常见的“有毒”组件例子：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP7-%E8%BA%AB%E4%BB%BD%E8%AF%86%E5%88%AB%E5%92%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF"><span class="toc-number">7.</span> <span class="toc-text">[TOP7]身份识别和身份验证错误</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E8%BA%AB%E4%BB%BD%E8%AF%86%E5%88%AB%E4%B8%8E%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%E9%94%99%E8%AF%AF%E2%80%9D%EF%BC%9F"><span class="toc-number">7.1.</span> <span class="toc-text">什么是“身份识别与身份验证错误”？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E8%A1%A8%E7%8E%B0%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-number">7.2.</span> <span class="toc-text">具体表现有哪些？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP8-%E8%BD%AF%E4%BB%B6%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E6%95%85%E9%9A%9C"><span class="toc-number">8.</span> <span class="toc-text">[TOP8]软件和数据完整性故障</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E8%BD%AF%E4%BB%B6%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AE%8C%E6%95%B4%E6%80%A7%E6%95%85%E9%9A%9C%E2%80%9D%EF%BC%9F"><span class="toc-number">8.1.</span> <span class="toc-text">什么是“软件和数据完整性故障”？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E6%94%BB%E5%87%BB%E5%9C%BA%E6%99%AF"><span class="toc-number">8.2.</span> <span class="toc-text">常见攻击场景</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP9-%E5%AE%89%E5%85%A8%E6%97%A5%E5%BF%97%E5%92%8C%E7%9B%91%E6%8E%A7%E6%95%85%E9%9A%9C"><span class="toc-number">9.</span> <span class="toc-text">[TOP9]安全日志和监控故障</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E5%AE%89%E5%85%A8%E6%97%A5%E5%BF%97%E5%92%8C%E7%9B%91%E6%8E%A7%E6%95%85%E9%9A%9C-%E2%80%9D%EF%BC%9F"><span class="toc-number">9.1.</span> <span class="toc-text">什么是“安全日志和监控故障 ”？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E8%A1%A8%E7%8E%B0"><span class="toc-number">9.1.1.</span> <span class="toc-text">常见表现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E5%8D%B1%E5%AE%B3"><span class="toc-number">9.1.2.</span> <span class="toc-text">实际危害</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TOP10-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-SSRF"><span class="toc-number">10.</span> <span class="toc-text">[TOP10]服务器端请求伪造(SSRF)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E2%80%9C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AB%AF%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-SSRF-%E2%80%9D%EF%BC%9F"><span class="toc-number">10.1.</span> <span class="toc-text">什么是“服务器端请求伪造(SSRF) ”？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="toc-number">10.1.1.</span> <span class="toc-text">攻击原理：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%B5%8B%E6%96%B9%E6%B3%95%EF%BC%88%E5%AE%9E%E6%88%98%E6%8A%80%E5%B7%A7%EF%BC%89%EF%BC%9A"><span class="toc-number">10.1.2.</span> <span class="toc-text">检测方法（实战技巧）：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%B6%E4%BC%B8%E5%9C%BA%E6%99%AF%EF%BC%88%E4%BA%91%E5%8E%9F%E7%94%9F%EF%BC%89%EF%BC%9A"><span class="toc-number">10.1.3.</span> <span class="toc-text">延伸场景（云原生）：</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"><img src="/img/mygo6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"/></a><div class="content"><a class="title" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行">文件解压之过（Zip Slip）漏洞导致 Python 代码执行</a><time datetime="2025-11-30T03:58:13.000Z" title="Created 2025-11-30 11:58:13">2025-11-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img src="/img/mygo7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BehinderV4魔改"/></a><div class="content"><a class="title" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改">BehinderV4魔改</a><time datetime="2025-10-30T12:38:13.000Z" title="Created 2025-10-30 20:38:13">2025-10-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程"><img src="/img/mygo1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Python多线程"/></a><div class="content"><a class="title" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程">Python多线程</a><time datetime="2025-10-26T13:23:24.000Z" title="Created 2025-10-26 21:23:24">2025-10-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础"><img src="/img/mygo2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Docker基础"/></a><div class="content"><a class="title" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础">Docker基础</a><time datetime="2025-10-17T08:01:55.000Z" title="Created 2025-10-17 16:01:55">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp"><img src="/img/anon3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2025年江苏省第七届大学生网络安全知识技能大赛-wp"/></a><div class="content"><a class="title" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp">2025年江苏省第七届大学生网络安全知识技能大赛-wp</a><time datetime="2025-09-22T10:38:33.000Z" title="Created 2025-09-22 18:38:33">2025-09-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By ALe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

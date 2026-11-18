@@ -1,0 +1,340 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作 | ALe's Blog</title><meta name="author" content="ALe"><meta name="copyright" content="ALe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="为了打CTF线下赛试着搞了一个本地大模型。 一开始，我希望本地模型能够像agent一样，读取题目、调用工具、分析输出，然后不断尝试直到解出题目。实际使用时，问题很快暴露出来：  工具失败后，模型可能换一个看似合理、实际上不存在的路径继续尝试； 面对一段 Base64 或空的 HTTP 响应，模型可能编出一个符合格式的 flag； 一次性塞入大量工具输出和技能文档，会占用有限的上下文； 模型有时会不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作">
+<meta property="og:url" content="https://ale1293528.github.io/2025/10/29/local-ctf-agent-blog/index.html">
+<meta property="og:site_name" content="ALe&#39;s Blog">
+<meta property="og:description" content="为了打CTF线下赛试着搞了一个本地大模型。 一开始，我希望本地模型能够像agent一样，读取题目、调用工具、分析输出，然后不断尝试直到解出题目。实际使用时，问题很快暴露出来：  工具失败后，模型可能换一个看似合理、实际上不存在的路径继续尝试； 面对一段 Base64 或空的 HTTP 响应，模型可能编出一个符合格式的 flag； 一次性塞入大量工具输出和技能文档，会占用有限的上下文； 模型有时会不">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://t.alcy.cc/moe?cover2">
+<meta property="article:published_time" content="2025-10-29T06:36:50.000Z">
+<meta property="article:modified_time" content="2026-11-18T11:15:08.585Z">
+<meta property="article:author" content="ALe">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="AI安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://t.alcy.cc/moe?cover2"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作",
+  "url": "https://ale1293528.github.io/2025/10/29/local-ctf-agent-blog/",
+  "image": "https://t.alcy.cc/moe?cover2",
+  "datePublished": "2025-10-29T06:36:50.000Z",
+  "dateModified": "2026-11-18T11:15:08.585Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ALe",
+      "url": "https://ale1293528.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://ale1293528.github.io/2025/10/29/local-ctf-agent-blog/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(https://t.alcy.cc/moe?background);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://t.alcy.cc/moe?cover2);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ALe's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">用 Qwen3 14B 搭建本地 CTF Agent：从工具调用到人机协作</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-10-29T06:36:50.000Z" title="Created 2025-10-29 14:36:50">2025-10-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-11-18T11:15:08.585Z" title="Updated 2026-11-18 19:15:08">2026-11-18</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>为了打CTF线下赛试着搞了一个本地大模型。</p>
+<p>一开始，我希望本地模型能够像agent一样，读取题目、调用工具、分析输出，然后不断尝试直到解出题目。实际使用时，问题很快暴露出来：</p>
+<ul>
+<li>工具失败后，模型可能换一个看似合理、实际上不存在的路径继续尝试；</li>
+<li>面对一段 Base64 或空的 HTTP 响应，模型可能编出一个符合格式的 flag；</li>
+<li>一次性塞入大量工具输出和技能文档，会占用有限的上下文；</li>
+<li>模型有时会不断给出推测，却没有产生新的验证结果。</li>
+</ul>
+<p>这些问题并不只靠一句“不要幻觉”就能解决。我的思路是把系统拆成几层：模型负责提出和选择动作，工具负责执行，扩展负责约束流程、记录证据并控制输出。对于不适合全自动判断的步骤，再让用户参与选择或亲自验证。</p>
+<p>项目使用的主模型是 <strong>Qwen3 14B 4-bit</strong>，通过 MLX 在 Apple Silicon 上提供本地推理；Pi 负责会话和工具调用，<code>flag-loop.ts</code> 承担 CTF 任务相关的运行时约束。</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">flowchart TD</span><br><span class="line">    U[用户：题目、文件或目标] --&gt; P[Pi 会话与工具调度]</span><br><span class="line">    P --&gt; R[系统规则 APPEND_SYSTEM.md]</span><br><span class="line">    P --&gt; I[轻量技能索引 ctf-index]</span><br><span class="line">    P &lt;--&gt; M[本地 Qwen3 14B 4-bit 服务]</span><br><span class="line">    P --&gt; G[flag-loop.ts 运行时约束]</span><br><span class="line">    G --&gt; D&#123;运行模式&#125;</span><br><span class="line">    D --&gt;|自主| T[调查工具]</span><br><span class="line">    D --&gt;|人机交互| A[提出方案 → 用户选择]</span><br><span class="line">    A --&gt; T</span><br><span class="line">    D --&gt;|人类验证| H[提出方案 → 用户自行验证并输入结果]</span><br><span class="line">    T --&gt; O[工具输出]</span><br><span class="line">    H --&gt; O</span><br><span class="line">    O --&gt; E[提取候选与证据过滤]</span><br><span class="line">    E --&gt; P</span><br><span class="line">    P --&gt; S[submit_flag 校验]</span><br><span class="line">    S --&gt;|存在于本任务证据| F[允许给出已核对的候选]</span><br><span class="line">    S --&gt;|未通过| P</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="核心循环：观察、假设、调用、更新"><a href="#核心循环：观察、假设、调用、更新" class="headerlink" title="核心循环：观察、假设、调用、更新"></a>核心循环：观察、假设、调用、更新</h2><p>这里以 Tool Calling 为主循环：模型通过结构化参数调用工具，Pi 执行后再把结果交给模型。分析思路仍然包含 ReAct 式的“观察和行动”，但不要求模型在上下文中反复输出长篇推理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant U as 用户</span><br><span class="line">    participant P as Pi / 扩展</span><br><span class="line">    participant M as Qwen3 14B</span><br><span class="line">    participant T as 工具</span><br><span class="line">    U-&gt;&gt;P: 输入任务并选择模式</span><br><span class="line">    P-&gt;&gt;M: 任务、规则与当前上下文</span><br><span class="line">    M-&gt;&gt;P: 短观察 + 假设 + 一个工具调用</span><br><span class="line">    P-&gt;&gt;P: 检查模式、重复调用和路径规则</span><br><span class="line">    P-&gt;&gt;T: 放行的工具调用</span><br><span class="line">    T--&gt;&gt;P: 原始输出或错误</span><br><span class="line">    P-&gt;&gt;P: 提取证据并压缩长输出</span><br><span class="line">    P--&gt;&gt;M: 返回工具结果</span><br><span class="line">    Note over M,P: 根据新观察选择下一步；没有证据时不能宣布成功</span><br><span class="line">    M-&gt;&gt;P: submit_flag(候选)</span><br><span class="line">    P--&gt;&gt;M: verified=true 或拒绝原因</span><br></pre></td></tr></table></figure>
+
+<p>这里有几个具体约束：</p>
+<ol>
+<li><strong>每轮只允许一个工具调用。</strong> 模型应等到结果返回，再决定下一步，降低多个动作之间缺少反馈的问题。</li>
+<li><strong>简短记录当前观察和一个可测试假设。</strong> 长篇推演会消耗上下文，也不一定增加可验证信息。</li>
+<li><strong>把错误视为观察。</strong> 命令失败后先检查实际目录或工具帮助，不应凭空构造另一个系统路径。</li>
+<li><strong>阻止紧接着的相同调用。</strong> 当前实现对 <code>bash</code>、<code>read</code>、<code>grep</code>、<code>find</code> 比较工具名和参数；它只阻止紧邻的完全相同调用，不能识别语义等价的命令或更长周期的循环。</li>
+<li><strong>没有新证据时继续寻找可验证动作。</strong> 扩展会清理旧的循环提示，用较短的反馈促使模型改变输入或方法。</li>
+</ol>
+<p>这不是一个能够保证解题的通用搜索算法。它主要把“先验证，再下结论”放到每一轮执行中。</p>
+<h2 id="Agent-内部设计：把决策和执行拆开"><a href="#Agent-内部设计：把决策和执行拆开" class="headerlink" title="Agent 内部设计：把决策和执行拆开"></a>Agent 内部设计：把决策和执行拆开</h2><p>从实现角度看，这个 Agent 并不是一个独立的“大模型进程不断运行”。Pi 管理会话，并在输入、工具调用、工具返回和回合结束等节点触发事件。扩展订阅这些事件，维护少量任务状态，在关键节点决定放行、拦截或继续。模型只通过消息和工具接口参与循环，状态的维护与部分检查由扩展完成。</p>
+<p>可以把它理解为四个相互配合的部分：</p>
+<ol>
+<li><strong>决策层</strong>：模型读取题意、观察和工具描述，选择下一项验证；它负责提出动作，但不直接修改扩展中的证据集合。</li>
+<li><strong>调度层</strong>：Pi 接收结构化工具调用、执行工具、保存会话并将结果反馈给模型。</li>
+<li><strong>控制层</strong>：扩展根据任务状态和运行模式检查调用，并在回合结束时判断是否需要继续。</li>
+<li><strong>知识层</strong>：技能索引指向各题型的方法资料，由模型在需要时读取。技能提供可能的方向，实际判断仍需要题目输出支持。</li>
+</ol>
+<p>这种分层的好处是可以分别检查错误发生在哪里：模型可能提出了不合理假设，工具可能没有安装，运行时规则可能误拦截，用户也可能提供不完整的观察。最终回答的可信度取决于整条链路，而不是模型说得是否自信。</p>
+<h3 id="任务状态：扩展究竟记住了什么"><a href="#任务状态：扩展究竟记住了什么" class="headerlink" title="任务状态：扩展究竟记住了什么"></a>任务状态：扩展究竟记住了什么</h3><p>目前 <code>flag-loop.ts</code> 用进程内变量保存状态。</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>作用</th>
+<th>边界</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ctfTaskActive</code></td>
+<td>标记是否启用 CTF 任务约束</td>
+<td>由输入中的关键词、URL 或 IP 等启发式识别；普通任务可能被误识别，CTF 任务也可能漏识别</td>
+</tr>
+<tr>
+<td><code>runMode</code></td>
+<td>保存 <code>auto</code>、<code>assisted</code> 或 <code>verify</code></td>
+<td>模式主要在识别到新任务时选择，并非任意输入都会重新切换</td>
+</tr>
+<tr>
+<td><code>evidenceFlags</code></td>
+<td>保存从工具结果提取且未被过滤的候选</td>
+<td>保存的是字符串集合，不包含完整的来源、时间、命令或可信度</td>
+</tr>
+<tr>
+<td><code>verifiedFlags</code></td>
+<td>保存通过 <code>submit_flag</code> 本地检查的候选</td>
+<td>不代表比赛平台已确认</td>
+</tr>
+<tr>
+<td><code>rejectedCandidates</code></td>
+<td>保存因不在证据中而被拒绝的候选</td>
+<td>当前任务内同一候选之后仍会被拒绝；不是带原因和时间的历史记录</td>
+</tr>
+<tr>
+<td><code>writtenPaths</code></td>
+<td>记录通过 <code>write</code>、<code>edit</code> 调用涉及的路径</td>
+<td>依赖路径字符串匹配，不能覆盖所有文件写入方式</td>
+</tr>
+<tr>
+<td><code>lastToolSignature</code></td>
+<td>保存最近一次指定工具的名称和参数签名</td>
+<td>只检查紧接着的相同调用，参数用 JSON 序列化比较</td>
+</tr>
+<tr>
+<td><code>toolCallsThisTurn</code></td>
+<td>记录当前回合是否已有工具调用</td>
+<td>用于限制单回合多次调用；被拦截的调用也可能占用该回合计数</td>
+</tr>
+<tr>
+<td><code>stalledTurns</code></td>
+<td>记录连续没有工具结果的回合</td>
+<td>用于调整续轮提示，并非任务进展的全面评分</td>
+</tr>
+<tr>
+<td><code>approvedSignature</code></td>
+<td>保存人机模式用户选中的工具和参数</td>
+<td>用于下一次精确匹配；它不是通用的权限管理系统</td>
+</tr>
+</tbody></table>
+<p>会话开始时扩展清空这些状态。识别到新的 CTF 输入时，会重置flag相关集合、已写路径、最近调用和批准动作，并选择运行模式。这里有一个值得注意的设计取舍：<strong>识别新任务的规则是启发式的</strong>，如果用户在同一题的后续消息中再次输入触发关键词，可能被当作新任务并清空已有证据。因此，当前任务边界不能等同于严格的题目 ID；正式使用中需要留意重新识别带来的影响。</p>
+<h3 id="生命周期：一次请求穿过哪些事件"><a href="#生命周期：一次请求穿过哪些事件" class="headerlink" title="生命周期：一次请求穿过哪些事件"></a>生命周期：一次请求穿过哪些事件</h3><p>下面是与现有扩展相对应的事件顺序；它是行为说明，不是逐行复制的源代码：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">session_start</span><br><span class="line">  清空扩展状态，默认模式设为 auto</span><br><span class="line"></span><br><span class="line">input</span><br><span class="line">  若输入命中 CTF 启发式：</span><br><span class="line">    解析显式模式，或在有界面时让用户选择</span><br><span class="line">    初始化本任务证据与控制状态</span><br><span class="line">    人机 / 人类验证模式追加中文协作提示</span><br><span class="line"></span><br><span class="line">turn_start</span><br><span class="line">  将本回合工具调用计数清零</span><br><span class="line"></span><br><span class="line">tool_call</span><br><span class="line">  如果当前 CTF 任务激活：</span><br><span class="line">    检查单回合工具数量</span><br><span class="line">    检查可识别的 make -f 文件路径</span><br><span class="line">    根据模式检查是否已批准或是否禁止自动调查</span><br><span class="line">    记录 write / edit 的路径</span><br><span class="line">    检查紧接着重复的工具调用</span><br><span class="line"></span><br><span class="line">tool_result</span><br><span class="line">  在压缩前提取符合格式的候选，并做启发式过滤</span><br><span class="line">  记录指定调查工具的调用签名</span><br><span class="line">  对过长文本结果做头尾压缩</span><br><span class="line"></span><br><span class="line">turn_end</span><br><span class="line">  对活跃 CTF 任务的本地模型已完成回合进行检查</span><br><span class="line">  如果已有工具结果，交由正常工具循环继续</span><br><span class="line">  如果最终文本包含已验证且有证据的候选，结束任务约束</span><br><span class="line">  否则清理部分旧反馈，注入短提示并请求继续</span><br></pre></td></tr></table></figure>
+
+<p>这里有两个容易忽略的区别。第一，工具执行失败通常也会产生工具结果，因此“有结果”不等于“有进展”。第二，连续三轮结束时没有工具结果会暂停自动续轮，用户重新输入可继续；但重复执行失败命令仍可能产生工具结果，这个计数不能识别所有无进展情况。</p>
+<p>下面的状态图是对事件行为的概念化表达，并非代码中存在一个同名状态机：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">stateDiagram-v2</span><br><span class="line">    [*] --&gt; 等待输入</span><br><span class="line">    等待输入 --&gt; 任务激活: 输入命中 CTF 规则</span><br><span class="line">    任务激活 --&gt; 等待模型: 设置模式并清空任务证据</span><br><span class="line">    等待模型 --&gt; 调用检查: 生成工具调用</span><br><span class="line">    调用检查 --&gt; 等待模型: 调用被拦截，返回原因</span><br><span class="line">    调用检查 --&gt; 等待用户: 人机模式提出候选</span><br><span class="line">    等待用户 --&gt; 工具执行: 用户选择并批准精确动作</span><br><span class="line">    等待用户 --&gt; 等待模型: 用户手动验证并输入观察</span><br><span class="line">    调用检查 --&gt; 工具执行: 自主模式 / 已批准动作</span><br><span class="line">    工具执行 --&gt; 结果处理: 返回输出或错误</span><br><span class="line">    结果处理 --&gt; 等待模型: 提取候选并返回结果</span><br><span class="line">    等待模型 --&gt; 完成检查: 模型尝试结束</span><br><span class="line">    完成检查 --&gt; 等待模型: 没有通过本地验证的候选</span><br><span class="line">    完成检查 --&gt; [*]: 输出包含已验证候选</span><br></pre></td></tr></table></figure>
+
+<h3 id="工具调用的契约：一个动作必须能够产生观察"><a href="#工具调用的契约：一个动作必须能够产生观察" class="headerlink" title="工具调用的契约：一个动作必须能够产生观察"></a>工具调用的契约：一个动作必须能够产生观察</h3><p>模型收到的规则要求每次选择一个工具，填写该工具所需的结构化参数。一个有价值的调用应当说明：当前观察是什么、要检验哪个假设、结果中什么信号会改变后续决策。它可以很短，但必须能连接到下一步。</p>
+<p>例如，看到一个未知文件时：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">观察：附件目录中有一个无扩展名文件。</span><br><span class="line">假设：它可能有可识别的文件格式。</span><br><span class="line">动作：调用工具检查文件类型与文件头。</span><br><span class="line">结果解释：如果有明确签名，按对应格式分析；如果没有，只能说明当前方法未识别。</span><br></pre></td></tr></table></figure>
+
+<p>如果结果是 <code>data</code>，它支持“常见签名未识别”这个观察，并不支持“文件一定加密”或“得到 flag”。后续动作应围绕长度、结构、题目描述及其他附件的关系继续验证。模型可以提出多个假设，但每个假设最好对应不同的可观察结果，避免把同一个无信息命令换个说法重复执行。</p>
+<p>在实现上，扩展只比较 <code>bash</code>、<code>read</code>、<code>grep</code>、<code>find</code> 的工具名与参数签名。比如同一条 <code>file</code> 命令紧接着再次运行会被拦截，而命令里额外加空格、换一个等价命令，或者隔着其他工具调用再重复，未必会被识别。更完善的进展检测需要记录动作、结果摘要和假设之间的关系；当前项目没有实现这一套语义去重。</p>
+<h3 id="两种人工参与的执行协议"><a href="#两种人工参与的执行协议" class="headerlink" title="两种人工参与的执行协议"></a>两种人工参与的执行协议</h3><p>两种人工模式共用 <code>propose_actions</code>，但对“用户选择”赋予不同含义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">    participant M as 模型</span><br><span class="line">    participant E as 扩展</span><br><span class="line">    participant U as 用户</span><br><span class="line">    participant T as 工具</span><br><span class="line">    M-&gt;&gt;E: propose_actions(候选假设、工具、参数、预期信号)</span><br><span class="line">    E-&gt;&gt;U: 显示可选方案</span><br><span class="line">    U-&gt;&gt;E: 选择一项</span><br><span class="line">    alt 人机交互</span><br><span class="line">        E--&gt;&gt;M: 返回所选工具及参数并保存签名</span><br><span class="line">        M-&gt;&gt;E: 发起相同工具和参数的调用</span><br><span class="line">        E-&gt;&gt;T: 签名匹配后放行</span><br><span class="line">        T--&gt;&gt;M: 返回工具结果</span><br><span class="line">    else 人类验证</span><br><span class="line">        E-&gt;&gt;U: 请求手动验证并输入观察</span><br><span class="line">        U-&gt;&gt;E: 输入观察结果</span><br><span class="line">        E--&gt;&gt;M: 返回用户输入的观察</span><br><span class="line">        Note over E,T: 扩展阻止列出的调查工具自动执行</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>human_verified</code> 字段是交互状态标记，而不是对真实性的密码学证明。用户可能在自己的终端、浏览器或其他工具里完成验证；模型看到的是用户输入文本。当前输入会截取前 8,000 个字符，因此过长结果可能丢失末尾内容。用户应尽量提供关键原文、执行条件和错误信息，并说明哪些是观察、哪些是个人判断。</p>
+<p>人机模式的批准与工具调用使用精确的序列化签名匹配：即使模型的动作语义相近，只要参数不一致也会被阻止。这可以减少“用户选了 A，模型实际执行 B”的情况，但对象键顺序等表示差异也可能导致匹配失败。此外，界面候选标签主要展示编号、假设和工具名，实际参数的可见性取决于交互界面与模型输出，不能假设用户已经审阅了所有命令细节。</p>
+<h3 id="终止条件与失败路径"><a href="#终止条件与失败路径" class="headerlink" title="终止条件与失败路径"></a>终止条件与失败路径</h3><p>成功路径需要经过候选提取、<code>submit_flag</code>、以及最终输出检查。扩展要求最终消息中包含同时存在于证据集合和已验证集合中的候选；若不满足，它可能清除带有未验证旗标的助手消息，并用短提示继续循环。</p>
+<p>失败路径则更复杂：网络不可达、工具未安装、模型不遵守工具协议、UI 取消、题目没有常见格式的旗标，都会造成任务不能正常完成。当前实现对于界面取消返回提示，让模型重新提出方案；对于缺少 UI 的候选选择则返回失败信息。扩展会在连续三轮没有工具结果时暂停，但没有对所有外部阻塞建立独立终止状态，所以仍需保留人工中断手段。</p>
+<p>设计上的下一步可以是增加显式的 <code>blocked</code> &#x2F; <code>completed</code> 状态、有限的失败预算、来源可追踪的证据记录，以及经用户确认的任务边界。这些都是<strong>尚未实现的改进方向</strong>，不应算作当前功能。</p>
+<h2 id="三种模式：自主、确认执行、人工验证"><a href="#三种模式：自主、确认执行、人工验证" class="headerlink" title="三种模式：自主、确认执行、人工验证"></a>三种模式：自主、确认执行、人工验证</h2><p>不是每道题、每一步都适合自动执行。因此，同一套 Agent 保留三种工作方式：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>模型做什么</th>
+<th>用户做什么</th>
+<th>谁执行调查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自主做题</td>
+<td>直接选择下一次工具调用</td>
+<td>提供任务，观察进展</td>
+<td>Agent</td>
+</tr>
+<tr>
+<td>人机交互</td>
+<td>调用 <code>propose_actions</code> 提出候选</td>
+<td>选择一个方案</td>
+<td>Agent 执行选中的精确工具和参数</td>
+</tr>
+<tr>
+<td>人类验证</td>
+<td>提出候选并等待观察结果</td>
+<td>选择方案，自行验证，输入结果</td>
+<td>用户</td>
+</tr>
+</tbody></table>
+<p>输入任务时可以使用 <code>[自主]</code>、<code>[人机]</code> 或 <code>[人类验证]</code> 指定模式；没有显式指定时，交互界面会提供选择。没有界面时当前实现默认自主模式。人机交互与人类验证模式要求使用中文描述观察、假设和方案；命令、代码、路径和目标原文保持原样。</p>
+<p><code>propose_actions</code> 的候选项包含方案编号、假设、工具、工具参数和预期信号。提示要求模型提供 2–4 项；当前代码会筛选可执行工具并最多保留 4 项，并不严格保证至少有两项。这种结构让用户能围绕“验证什么、看到什么才有意义”做选择，而不是只看到一句笼统的“继续扫描”。</p>
+<h2 id="如何阻止编造-flag"><a href="#如何阻止编造-flag" class="headerlink" title="如何阻止编造 flag"></a>如何阻止编造 flag</h2><p>最典型的错误是把“看起来像答案的东西”当成答案。例如，运行 <code>base64</code> 得到一个字符串，只说明文件被编码成了 Base64；这既不是解码，更不能证明字符串是 flag。空的 HTTP 响应、200 状态码或命令退出码为 0，也都不能单独证明解题成功。</p>
+<p>当前设计将旗标处理分为两步：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">flowchart LR</span><br><span class="line">    O[工具输出] --&gt; X[提取符合格式的候选]</span><br><span class="line">    X --&gt; C[过滤明显的自造证据]</span><br><span class="line">    C --&gt; E[保存本任务候选证据]</span><br><span class="line">    M[模型提交候选] --&gt; S[submit_flag]</span><br><span class="line">    E --&gt; S</span><br><span class="line">    S --&gt;|格式和逐字匹配通过| V[verified=true]</span><br><span class="line">    S --&gt;|缺少证据或格式不符| R[拒绝并继续调查]</span><br></pre></td></tr></table></figure>
+
+<p>扩展识别常见的 <code>flag&#123;...&#125;</code>、<code>...ctf&#123;...&#125;</code>、<code>htb&#123;...&#125;</code>、<code>pico&#123;...&#125;</code> 格式，并拒绝部分占位值。<code>submit_flag</code> 要求提交单个完整候选，且该值必须逐字存在于当前任务已收集的证据中。这里的 <code>verified=true</code> 表示<strong>通过本地格式与出现位置检查</strong>，不是向比赛平台提交后的正确性证明。</p>
+<p>为了减少明显的证据污染，当前实现不会把 <code>submit_flag</code> 的输出当成新证据；候选直接出现在工具参数中时也会排除。此外，对某些使用 <code>echo</code>、<code>printf</code> 或 <code>print</code> 的 Bash 输出，以及扩展记录过的 <code>write</code>&#x2F;<code>edit</code> 路径后续读取结果，会做启发式过滤。</p>
+<p>这些规则有实际边界：</p>
+<ul>
+<li>格式识别可能漏掉比赛使用的其他旗标格式，也可能匹配到题目中的示例；</li>
+<li>过滤依赖工具名、参数和简单字符串规则，无法证明输出没有被其他命令或文件污染；</li>
+<li>人类验证模式的输入通过 <code>propose_actions</code> 的工具结果返回，因此其中符合格式的字符串也可能进入候选证据；它的来源是用户输入，并非系统独立采集的原始输出；</li>
+<li>连续相同候选被拒绝后会被记入拒绝集合；实际比赛仍需结合题目和平台反馈判断。</li>
+</ul>
+<p>换句话说，这是一道降低幻觉风险的门，不是形式化的真实性证明。需要更强证据链时，还应记录候选的来源、命令、时间和上下文，并在最终结果中展示。</p>
+<h2 id="工具失败之后：不要猜路径"><a href="#工具失败之后：不要猜路径" class="headerlink" title="工具失败之后：不要猜路径"></a>工具失败之后：不要猜路径</h2><p>曾经遇到过这样的行为：模型在编译一个项目时，连续尝试了多个并不存在的系统 Makefile 路径。出错信息已经说明文件不存在，但模型没有先查看项目目录，而是继续猜测。</p>
+<p>当前系统从两侧约束这类问题：系统提示要求失败后先检查目录、文件和帮助；扩展则会对能识别的 <code>make -f &lt;路径&gt;</code> 做存在性检查，不存在时阻止调用并要求检查项目目录。</p>
+<p>这项检查只处理代码正则能识别的命令形式，并按照 Pi 的当前工作目录解析路径。复杂 shell、变量展开或命令中的 <code>cd</code> 等情况可能超出它的判断范围，因此不能把它视为完整的 shell 解析器。它的价值是拦截一类已经出现过的错误，而不是保证所有构建命令都正确。</p>
+<h2 id="如何控制上下文消耗"><a href="#如何控制上下文消耗" class="headerlink" title="如何控制上下文消耗"></a>如何控制上下文消耗</h2><p>本地 Qwen3 14B 的配置上下文窗口为 16,384 tokens。上下文除了装题目和结果，还要留出空间给工具调用及模型回复，因此需要把信息按用途组织。</p>
+<p>当前方案包括：</p>
+<ul>
+<li><strong>技能索引</strong>：启动时只配置轻量的 <code>ctf-index</code>，按题型再读取需要的技能文档，避免一开始就加载全部细节。</li>
+<li><strong>短决策</strong>：要求模型围绕观察、假设和下一步说话，减少反复生成长篇推演。</li>
+<li><strong>工具结果压缩</strong>：单个文本块超过 12,000 字符时保留开头和结尾，并附带识别到的旗标形态字符串。中间内容可能丢失；需要详细分析时应重新做有针对性的查询。</li>
+<li><strong>旧结果的上下文投影</strong>：活跃 CTF 任务中保留最近四条调查结果；更早的 <code>bash</code>、<code>read</code>、<code>grep</code>、<code>find</code> 结果，文本块超过 2,400 字符时，发送模型前仅保留前后各 900 字符、截断说明及最多 6 个未验证的旗标形态字符串。此步骤不改写 Pi 已保存的消息，但前述 12,000 字符的工具结果压缩可能已经丢失原始中段。</li>
+<li><strong>空转暂停</strong>：连续三轮没有工具结果时暂停自动续轮；用户再次输入后可继续。重复失败但仍产生工具结果的情况不受该规则覆盖。</li>
+<li><strong>会话压缩</strong>：Pi 设置启用 compaction，配置预留 4,096 tokens、保留最近 8,000 tokens。实际压缩结果仍取决于运行时和会话内容。</li>
+<li><strong>清理循环反馈</strong>：扩展删除旧的自身提示；未验证且包含旗标形态字符串的助手消息会从后续上下文移除，降低模型反复复制猜测的机会。</li>
+</ul>
+<p>手动执行 <code>/compact 保留题目目标、已确认事实及来源、失败尝试、未验证假设和下一步；不要把推测写成事实。</code> 可以让 Pi 的摘要更聚焦。摘要由模型生成，可能遗漏信息或混淆事实，不能充当独立证据记录。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io">ALe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ale1293528.github.io/2025/10/29/local-ctf-agent-blog/">https://ale1293528.github.io/2025/10/29/local-ctf-agent-blog/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CTF/">CTF</a><a class="post-meta__tags" href="/tags/AI%E5%AE%89%E5%85%A8/">AI安全</a></div><div class="post-share"><div class="social-share" data-image="https://t.alcy.cc/moe?cover2" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/10/30/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改"><img class="cover" src="https://t.alcy.cc/moe?cover6" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">BehinderV4魔改</div></div><div class="info-2"><div class="info-item-1">“冰蝎”(Behinder)是一个动态二进制加密网站管理客户端，相比较于传统的老牌工具“菜刀”而言，对webshell的流量进行了相应的加密。”冰蝎”客户端基于JAVA，所以可以跨平台使用，随着版本的升级，兼容性也随之提升。主要功能为：基本信息、命令执行、虚拟终端、文件管理、Socks代理、反弹shell、数据库管理、自定义代码等，功能非常强大，是现如今必不可少的渗透测试工具之一 如今借助大模型，ai 对流量中木马特征的监测已经越来越准确，可冰蝎早已不再更新，木马上传上去之间就落地成盒，所以我们要对冰蝎马在原本的基础上进行改造 冰蝎特征冰蝎有两个强特征，分别是  和数据包一大堆加密 如果这个数据包可以用冰蝎的传输协议解密，那就实锤为冰蝎马 除此之外还有数个弱特征例如 connection：keep-alive ，固定的 ua 头等 所以我们的魔改需要解决两个问题：  绕过识别（魔改打乱指纹信息） 绕过查杀（新增加密算法）  JAP 反编译打包构建https://www.decompiler.com/ 在这个网站在线反编译，然后下载下来（也可以用 jd-gui 工具反编译） 在 i...</div></div></div></a><a class="pagination-related" href="/2025/10/26/Python%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Python多线程"><img class="cover" src="https://t.alcy.cc/moe?cover5" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Python多线程</div></div><div class="info-2"><div class="info-item-1">首先我们要了解一点基础知识 线程与进程进程（Process）进程是操作系统中资源分配的最小单位，简单来说，一个进程就是一个正在运行的程序的实例，操作系统会为每个进程分配独立的内存空间、文件句柄、CPU 时间、网络端口等资源。不同的进程之间相互独立，一个进程崩了不会影响另一个进程 在 Python 中，一个multiprocessing.Process() 启动的任务就是一个新的子进程，它拥有独立的 Python 解释器和内存空间 线程（Thread）线程是进程中的执行单元，是操作系统中能进行调度的最小单位 一个进程可以有多个线程，多个线程共享同一个进程的内存和资源，每个线程只负责执行一部分任务。  在 Python 里，threading.Thread() 或 ThreadPoolExecutor() 启动的就是线程 Python 中的区别和限制Python 中有一个叫 GIL（全局解释器锁） 的机制，这个机制让同一时刻只能有一个线程在执行 Python 字节码，所以对于 CPU 密集型任务，多线程的效果并不大，但是对于 I&#x2F;O 密集型任务（网络请求、文件操作等），多线...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/06/07/H&NCTF2026-wp/" title="H&amp;NCTF2026-wp"><img class="cover" src="https://t.alcy.cc/moe?cover6" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-07</div><div class="info-item-2">H&amp;NCTF2026-wp</div></div><div class="info-2"><div class="info-item-1">prototype-preview根据题目名称猜测是js原型链污染 &#x2F;source路由发现源码  未过滤 __proto__，导致原型链污染 payload： 123456789&#123;    &quot;name&quot;: &quot;x&quot;,    &quot;bio&quot;: &quot;x&quot;,    &quot;theme&quot;: &#123;&quot;color&quot;: &quot;#333&quot;, &quot;layout&quot;: &quot;a&quot;&#125;,    &quot;__proto__&quot;: &#123;      &quot;escapeFunction&quot;: &quot;escapeHtml;out.push(require(\&quot;child_process\&quot;).execSync(\&quot;env\&quot;).toString())&quot;    &#125;&#125;   flag{111b6bb4-8b0c-450c-9d...</div></div></div></a><a class="pagination-related" href="/2025/08/15/LilCTF2025-wp/" title="LilCTF2025-wp"><img class="cover" src="https://t.alcy.cc/moe?cover2" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-15</div><div class="info-item-2">LilCTF2025-wp</div></div><div class="info-2"><div class="info-item-1">比赛这两天一直在驾校练车，没时间打比赛，所以没出几道，排名也是很拉，就不放截图了 CRYPTO密码没学过，全是ai ez_math12345678910111213141516171819202122from sage.all import *from Crypto.Util.number import *flag = b&#x27;LILCTF&#123;test_flag&#125;&#x27;[7:-1]lambda1 = bytes_to_long(flag[:len(flag)//2])lambda2 = bytes_to_long(flag[len(flag)//2:])p = getPrime(512)def mul(vector, c):    return [vector[0]*c, vector[1]*c]v1 = [getPrime(128), getPrime(128)]v2 = [getPrime(128), getPrime(128)]A = matrix(GF(p), [v1, v2])B = matrix(GF(p), [mul(v1,lambda...</div></div></div></a><a class="pagination-related" href="/2025/08/24/NSSCTF-4th-wp/" title="NSSCTF 4th-wp"><img class="cover" src="https://t.alcy.cc/moe?cover4" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-24</div><div class="info-item-2">NSSCTF 4th-wp</div></div><div class="info-2"><div class="info-item-1">依旧是单军奋战这一块，而且下午睡到 5 点多才想起来还有这么个比赛，半个小时速通两道 WEB 题这一块 WEBez_signin这题就是典型的 MongoDB NoSQL 注入，突破口在源码里 POST &#x2F;search 接受 JSON 时，title&#x2F;author 如果是 dict 会被原样拼进查询，没有加 $eq 且不做净化，所以可以直接塞 $ne &#x2F; $regex 等操作符来“放大查询”拿到库里全部书、然后做一轮搜索搜出 flagexp： 123456789101112131415161718192021222324252627282930313233343536373839404142import requests, re, jsonbase = &quot;http://node8.anna.nssctf.cn:27612&quot;def dump_all():    # 取全量（有标题的都来）    r = requests.post(base + &quot;/search&quot;,                      hea...</div></div></div></a><a class="pagination-related" href="/2025/09/22/2025%E5%B9%B4%E6%B1%9F%E8%8B%8F%E7%9C%81%E7%AC%AC%E4%B8%83%E5%B1%8A%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%9F%A5%E8%AF%86%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-wp/" title="2025年江苏省第七届大学生网络安全知识技能大赛-wp"><img class="cover" src="https://t.alcy.cc/moe?cover8" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-09-22</div><div class="info-item-2">2025年江苏省第七届大学生网络安全知识技能大赛-wp</div></div><div class="info-2"><div class="info-item-1">遗憾差一点点没进决赛， 还是少个二进制啊，可惜我们学校二进制断代了┭┮﹏┭┮ 比赛期间太仓促了，忘了截图，就这样纯文字吧签到密文：kaljviko8ohhh59;49:p单字符的xor，写个简单脚本计算： 12s = &quot;kaljviko8ohhh59;49:p&quot;print(&#x27;&#x27;.join(chr(ord(c)^13) for c in s)) flag{dfb5beee846947} misc1流量包内搜索 flag 的 base64 编码的前面部分 http contains &quot;Zmxh&quot; 找到一段流量包，跟踪 http 流，里面有这么一段： 1ZmxhZ3thNjVlMjdhZmMyYTdmN2UyN2ZmYjZkMjM5Mzk1ODU3Zn0iPmZsYWcudHh0O2VjaG8gY2E0OTg1ZjBmOGE5O3B3ZDtlY2hvIDJmOWUwNDJlM2Y2MQ%3D%3D 解 base64 得到 flag flag{a65e27afc2a7f7e27ffb6d239395857f} web1刚开始没看...</div></div></div></a><a class="pagination-related" href="/2025/08/09/XYCTF2025-wp/" title="XYCTF2025-wp"><img class="cover" src="https://t.alcy.cc/moe?cover8" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-09</div><div class="info-item-2">XYCTF2025-wp</div></div><div class="info-2"><div class="info-item-1">比赛是之前打的，但是一直没有复盘，暑假闲来无事故决定复盘一下，也是作为复习 WEBfate12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182#!/usr/bin/env python3import flaskimport sqlite3import requestsimport stringimport jsonapp = flask.Flask(__name__)blacklist = string.ascii_lettersdef binary_to_string(binary_string):    if len(binary_string) % 8 != 0:        raise ValueError(&quot;Binary string length must be a multiple of 8&quot...</div></div></div></a><a class="pagination-related" href="/2026/01/13/ciscn2026%E5%88%9D%E8%B5%9Bwp-web/" title="ciscn2026初赛wp-web"><img class="cover" src="https://t.alcy.cc/moe?cover7" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-13</div><div class="info-item-2">ciscn2026初赛wp-web</div></div><div class="info-2"><div class="info-item-1">打的时候刚好是刚刚期末考完的哪个周末，已经放飞自我了状态非常差，几乎什么都没做出来，本来都不准备看了，但是还是复盘一下 redisNext.js 框架的网站，用最近的cve来打，但是我最近没有关注相关漏洞，所以不知道，也没细看这道题 AI_WAF我用到的是内联注释绕WAF： ‘ &#x2F;!50000union&#x2F; &#x2F;!50000select&#x2F; 1,2,3#获取数据库的名和版本‘ &#x2F;!50000union&#x2F; &#x2F;!50000select&#x2F; -1,database(),version()#得到 数据库名nexadata获取表名‘ &#x2F;!50000union&#x2F; &#x2F;!50000select&#x2F; -1,group_concat(table_name),3 from information_schema.tables where table_schema&#x3D;’nexadata’#发现两个表：Article where_is_my_flagggggg获取列名‘ &#x2F;!500...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/anon1.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ALe</div><div class="author-info-description">从渗透测试到网安烧烤的一生</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">8</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ALe1293528"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">恐惧扼住咽喉，如枷锁禁锢我的双臂 我向沉默发问，沉默却愈发震耳欲聋</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%BE%AA%E7%8E%AF%EF%BC%9A%E8%A7%82%E5%AF%9F%E3%80%81%E5%81%87%E8%AE%BE%E3%80%81%E8%B0%83%E7%94%A8%E3%80%81%E6%9B%B4%E6%96%B0"><span class="toc-number">2.</span> <span class="toc-text">核心循环：观察、假设、调用、更新</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Agent-%E5%86%85%E9%83%A8%E8%AE%BE%E8%AE%A1%EF%BC%9A%E6%8A%8A%E5%86%B3%E7%AD%96%E5%92%8C%E6%89%A7%E8%A1%8C%E6%8B%86%E5%BC%80"><span class="toc-number">3.</span> <span class="toc-text">Agent 内部设计：把决策和执行拆开</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%8A%B6%E6%80%81%EF%BC%9A%E6%89%A9%E5%B1%95%E7%A9%B6%E7%AB%9F%E8%AE%B0%E4%BD%8F%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">3.1.</span> <span class="toc-text">任务状态：扩展究竟记住了什么</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%EF%BC%9A%E4%B8%80%E6%AC%A1%E8%AF%B7%E6%B1%82%E7%A9%BF%E8%BF%87%E5%93%AA%E4%BA%9B%E4%BA%8B%E4%BB%B6"><span class="toc-number">3.2.</span> <span class="toc-text">生命周期：一次请求穿过哪些事件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%9A%84%E5%A5%91%E7%BA%A6%EF%BC%9A%E4%B8%80%E4%B8%AA%E5%8A%A8%E4%BD%9C%E5%BF%85%E9%A1%BB%E8%83%BD%E5%A4%9F%E4%BA%A7%E7%94%9F%E8%A7%82%E5%AF%9F"><span class="toc-number">3.3.</span> <span class="toc-text">工具调用的契约：一个动作必须能够产生观察</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E4%BA%BA%E5%B7%A5%E5%8F%82%E4%B8%8E%E7%9A%84%E6%89%A7%E8%A1%8C%E5%8D%8F%E8%AE%AE"><span class="toc-number">3.4.</span> <span class="toc-text">两种人工参与的执行协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%88%E6%AD%A2%E6%9D%A1%E4%BB%B6%E4%B8%8E%E5%A4%B1%E8%B4%A5%E8%B7%AF%E5%BE%84"><span class="toc-number">3.5.</span> <span class="toc-text">终止条件与失败路径</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F%EF%BC%9A%E8%87%AA%E4%B8%BB%E3%80%81%E7%A1%AE%E8%AE%A4%E6%89%A7%E8%A1%8C%E3%80%81%E4%BA%BA%E5%B7%A5%E9%AA%8C%E8%AF%81"><span class="toc-number">4.</span> <span class="toc-text">三种模式：自主、确认执行、人工验证</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E9%98%BB%E6%AD%A2%E7%BC%96%E9%80%A0-flag"><span class="toc-number">5.</span> <span class="toc-text">如何阻止编造 flag</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E5%A4%B1%E8%B4%A5%E4%B9%8B%E5%90%8E%EF%BC%9A%E4%B8%8D%E8%A6%81%E7%8C%9C%E8%B7%AF%E5%BE%84"><span class="toc-number">6.</span> <span class="toc-text">工具失败之后：不要猜路径</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6%E4%B8%8A%E4%B8%8B%E6%96%87%E6%B6%88%E8%80%97"><span class="toc-number">7.</span> <span class="toc-text">如何控制上下文消耗</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/06/11/bp_JsFuzz/" title="bp_JsFuzz 被动扫描插件"><img src="https://t.alcy.cc/moe?cover4" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="bp_JsFuzz 被动扫描插件"/></a><div class="content"><a class="title" href="/2026/06/11/bp_JsFuzz/" title="bp_JsFuzz 被动扫描插件">bp_JsFuzz 被动扫描插件</a><time datetime="2026-06-11T08:34:52.000Z" title="Created 2026-06-11 16:34:52">2026-06-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/06/07/H&amp;NCTF2026-wp/" title="H&amp;NCTF2026-wp"><img src="https://t.alcy.cc/moe?cover6" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="H&amp;NCTF2026-wp"/></a><div class="content"><a class="title" href="/2026/06/07/H&amp;NCTF2026-wp/" title="H&amp;NCTF2026-wp">H&amp;NCTF2026-wp</a><time datetime="2026-06-07T07:49:13.000Z" title="Created 2026-06-07 15:49:13">2026-06-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/31/%E7%AC%AC%E5%8D%81%E5%B1%8A%E5%BE%A1%E7%BD%91%E6%9D%AFCTF%E8%B5%9B%E9%81%93-wp/" title="第十届御网杯CTF赛道-wp"><img src="https://t.alcy.cc/moe?cover8" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="第十届御网杯CTF赛道-wp"/></a><div class="content"><a class="title" href="/2026/05/31/%E7%AC%AC%E5%8D%81%E5%B1%8A%E5%BE%A1%E7%BD%91%E6%9D%AFCTF%E8%B5%9B%E9%81%93-wp/" title="第十届御网杯CTF赛道-wp">第十届御网杯CTF赛道-wp</a><time datetime="2026-05-31T10:51:29.000Z" title="Created 2026-05-31 18:51:29">2026-05-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/12/RASP%E7%9A%84%E7%BB%95%E8%BF%87/" title="RASP的绕过"><img src="https://t.alcy.cc/moe?cover2" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RASP的绕过"/></a><div class="content"><a class="title" href="/2026/05/12/RASP%E7%9A%84%E7%BB%95%E8%BF%87/" title="RASP的绕过">RASP的绕过</a><time datetime="2026-05-12T10:47:06.000Z" title="Created 2026-05-12 18:47:06">2026-05-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/12/RASP%E7%9A%84%E5%9F%BA%E7%A1%80/" title="RASP的基础"><img src="https://t.alcy.cc/moe?cover3" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RASP的基础"/></a><div class="content"><a class="title" href="/2026/05/12/RASP%E7%9A%84%E5%9F%BA%E7%A1%80/" title="RASP的基础">RASP的基础</a><time datetime="2026-05-12T10:32:06.000Z" title="Created 2026-05-12 18:32:06">2026-05-12</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://t.alcy.cc/moe?footer);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;2025 - 2026 By ALe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.2</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
